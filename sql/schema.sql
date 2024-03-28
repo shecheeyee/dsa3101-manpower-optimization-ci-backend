@@ -1,18 +1,20 @@
 CREATE TABLE IF NOT EXISTS Employees (
-  empId INT PRIMARY KEY AUTO_INCREMENT,
-  firstName VARCHAR(50) NOT NULL,
-  lastName VARCHAR(50) NOT NULL,
+  emp_id INT PRIMARY KEY AUTO_INCREMENT,
+  first_name VARCHAR(50) NOT NULL,
+  last_name VARCHAR(50) NOT NULL,
   age INT NOT NULL,
-  primaryRole ENUM('Manager', 'Server', 'Cook', 'Dishwasher') NOT NULL,
-  secondaryRole ENUM('Manager', 'Server', 'Cook', 'Dishwasher'),
-  wage DECIMAL(10,2) NOT NULL, --stsatus
+  email VARCHAR(50) NOT NULL,
+  gender ENUM('M', 'F') NOT NULL,
+  primary_role ENUM('Manager', 'Server', 'Cook', 'Dishwasher'),
+  secondary_role ENUM('Manager', 'Server', 'Cook', 'Dishwasher'),
+  wage DECIMAL(10,2), 
   status ENUM('Part time', 'Full time'),
   address VARCHAR(256)
 );
 
 CREATE TABLE IF NOT EXISTS Schedules (
   scheduleId INT PRIMARY KEY AUTO_INCREMENT,
-  employeeId INT FOREIGN KEY REFERENCES Employees(empId),
+  emp_id INT FOREIGN KEY REFERENCES Employees(emp_id),
   week DATE NOT NULL,
   day ENUM('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday') NOT NULL,
   shift ENUM('Unavailable', 'Shift 1', 'Shift 2', 'Both') NOT NULL,
@@ -20,7 +22,7 @@ CREATE TABLE IF NOT EXISTS Schedules (
 );
 
 CREATE TABLE IF NOT EXISTS Availability (
-  employeeId INT PRIMARY KEY REFERENCES Employees(empId),
+  emp_id INT PRIMARY KEY REFERENCES Employees(emp_id),
   week DATE NOT NULL,
   mon TINYINT NOT NULL CHECK (mon >= 0 AND mon <= 3),  -- Values: 0 (Unavailable), 1 (Shift 1), 2 (Shift 2), 3 (Both)
   tues TINYINT NOT NULL CHECK (tues >= 0 AND mon <= 3),
@@ -34,12 +36,13 @@ CREATE TABLE IF NOT EXISTS Availability (
 
 
 CREATE TABLE IF NOT EXISTS Events (
-  eventId INT PRIMARY KEY AUTO_INCREMENT,
+  event_id INT PRIMARY KEY AUTO_INCREMENT,
   date DATE NOT NULL,
-  eventType VARCHAR(50) NOT NULL,
-  eventName VARCHAR(50),
+  event_type VARCHAR(50),
+  eventName VARCHAR(50) NOT NULL,
   numPax INT,
-  time TIME NOT NULL
+  time TIME NOT NULL,
+  duration DECIMAL(5,2) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS DemandForecast (
@@ -57,3 +60,9 @@ CREATE TABLE IF NOT EXISTS SummaryStats (
   avgHours DECIMAL(5,2),
   CONSTRAINT unique_summary_stats UNIQUE (date, shift)
 );
+
+CREATE TABLE IF NOT EXISTS Wage {
+    day ENUM('Weekday', 'Weekend', 'Public Holiday'),
+    role ENUM('Server', 'Cook', 'Dishwasher'),
+    wage DECIMAL(10,2) NOT NULL
+};
