@@ -34,6 +34,28 @@ def get_weather_forecast():
     else:
         return jsonify({"error": "Failed to fetch weather forecast"}), 500
 
+# Hardcoded demand data
+demand_data = {
+    "Monday": 300,
+    "Tuesday": 900,
+    "Wednesday": 300,
+    "Thursday": 300,
+    "Friday": 500,
+    "Saturday": 600,
+    "Sunday": 700,
+}
+
+# Endpoint to get demand forecast
+@app.route("/demand_forecast", methods=["GET"])
+def get_demand_forecast():
+    # Get the current day of the week
+    current_day = datetime.now().strftime("%A")
+    # Get the demand for today
+    today_demand = demand_data.get(current_day)
+    if today_demand is not None:
+        return jsonify({current_day: today_demand}), 200
+    else:
+        return jsonify({"error": "Demand data not available for today"}), 404
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
