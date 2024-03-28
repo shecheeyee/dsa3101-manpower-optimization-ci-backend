@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS Employees (
   last_name VARCHAR(50) NOT NULL,
   age INT NOT NULL,
   email VARCHAR(50) NOT NULL,
+  number VARCHAR(50) NOT NULL,
   gender ENUM('M', 'F') NOT NULL,
   primary_role ENUM('Manager', 'Server', 'Cook', 'Dishwasher'),
   secondary_role ENUM('Manager', 'Server', 'Cook', 'Dishwasher'),
