@@ -1,0 +1,21 @@
+event_id,date,event_type,event_name,num_pax,time,duration
+1,2024-01-23,Random,Annual Sandwort,52,15:24,1
+2,2024-01-26,Wings of time,Dot Lichen,61,13:37,2
+3,2024-01-10,Random,Raven's Milkvetch,25,20:26,1
+4,2024-01-19,Tour,Hairy Townsend Daisy,57,18:15,2
+5,2024-01-15,Random,Cypress Spurge,31,19:55,3
+6,2024-01-04,Company,Sesbania,63,12:10,2
+7,2024-01-25,Company,Woodland Flax,23,12:42,2
+8,2024-01-30,Wings of time,Nutmeg Hickory,96,18:24,1
+9,2024-01-03,Random,Desert Pussypaws,29,12:06,2
+10,2024-01-30,Random,Cup Lichen,85,20:28,1
+11,2024-01-24,Wings of time,Trypelthelium Lichen,89,13:12,2
+12,2024-01-07,Wings of time,Geyer's Milkvetch,70,19:19,2
+13,2024-01-21,Company,Yellow Avalanche-lily,84,15:02,1
+14,2024-01-07,Random,Smith's Buckthorn,76,19:48,2
+15,2024-01-06,Company,Catillaria Lichen,66,17:20,2
+16,2024-01-23,Random,Woolly Maidenhair,55,18:06,3
+17,2024-01-27,Company,Longbeak Arrowhead,25,14:45,3
+18,2024-01-06,Company,Zigzag Larkspur,79,20:17,3
+19,2024-01-21,Tour,Pricklypear,63,20:44,3
+20,2024-01-10,Random,Quinine,37,16:58,1

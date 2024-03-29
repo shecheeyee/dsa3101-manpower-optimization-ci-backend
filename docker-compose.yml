@@ -2,8 +2,9 @@ version: '3.9'  # Docker Compose version
 
 services:
   # Backend service 
-  backend:
-    build: .  
+  flask-app:
+    container_name: flask-app
+    build: src # from dockerfile in src directory
     ports:
       - "5000:5000"  # Map Flask app port 
     volumes:
@@ -12,11 +13,14 @@ services:
       - mysql  
 
 
-  mysql:
-    image: mysql:latest  
+  mysql-db:
+    container_name: mysql-db
+    image: mysql:latest
     environment:
-      MYSQL_ROOT_PASSWORD: xxx  
+      MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: mflg  
+    ports:
+      - "3306:3306"  # Map MySQL port
     volumes:
       - mysql_data:/var/lib/mysql  # Persist database data using a volume
 
