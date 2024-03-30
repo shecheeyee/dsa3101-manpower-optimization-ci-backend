@@ -25,9 +25,11 @@ def get_wage() -> List[Dict]:
 
     try:
         connection = pymysql.connect(**config)
+        print("db connected")
         cursor = connection.cursor()
         cursor.execute('SELECT * FROM Wage')
         result = cursor.fetchall()
+        print(result)
         return [{'day': row[0], 'role': row[1], 'wage':row[2]} for row in result]  
 
     except Exception as e:
@@ -40,12 +42,10 @@ def get_wage() -> List[Dict]:
         if connection:
             connection.close()
 
-
-@app.route('/')
-def index() -> str:
+@app.route('/') 
+def index(): 
     wage = get_wage()
-    return json.dumps({'wage': employees})
-
+    return json.dumps({'wage': wage})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
