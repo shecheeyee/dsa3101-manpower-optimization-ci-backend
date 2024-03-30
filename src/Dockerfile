@@ -1,6 +1,11 @@
 FROM python:latest
+
+EXPOSE 5000
+
 COPY . /src
+
 WORKDIR /src
-RUN pip install -r ../requirements.txt
-ENTRYPOINT ["python"]
-CMD ["app.py"] 
+
+RUN pip install -r requirements.txt
+
+CMD python app.py
