@@ -1,51 +1,50 @@
 # testing
 from typing import List, Dict
-from flask import Flask
-import pymysql
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+from db_utils import execute_query
+from model.employee import  create_employee, update_employee, get_all_employees, delete_employee
 import json
 import csv
 
 app = Flask(__name__)
+CORS(app)
 
+@app.route('/employees', methods=['POST'])
+def create_new_employee():
+    employee_data = request.json
+    create_employee(employee_data)
+    return jsonify({'message': 'Employee created successfully'}), 201
 
-config = {
-        'user': 'root',
-        'password': 'root',
-        'host': 'mysql-db',
-        'port': '3306',
-        'database': 'mflg'
-    }
+# Function to retrieve all employees
+@app.route('/employees', methods=['GET'])
+def get_employees():
+    employees = get_all_employees()
+    return jsonify({'employees': employees})
 
-            
-def get_wage() -> List[Dict]:
-    """
-    Test: fetches wage data from the database and returns as a list of dictionaries.
-    """
-    config = config
+# Function to update an employee
+@app.route('/employees/<int:emp_id>', methods=['PUT'])
+def update_e(emp_id):
+    update_data = request.json
+    update_employee(emp_id, update_data)
+    return jsonify({'message': f'Employee with ID {emp_id} updated successfully'}), 200
 
-    try:
-        connection = pymysql.connect(**config)
-        print("db connected")
-        cursor = connection.cursor()
-        cursor.execute('SELECT * FROM Wage')
-        result = cursor.fetchall()
-        print(result)
-        return [{'day': row[0], 'role': row[1], 'wage':row[2]} for row in result]  
+# Function to delete an employee
+@app.route('/employees/<int:emp_id>', methods=['DELETE'])
+def delete_e(emp_id):
+    delete_employee(emp_id)
+    return jsonify({'message': f'Employee with ID {emp_id} deleted successfully'}), 200
 
-    except Exception as e:
-        print(f"Error fetching wage: {e}")
-        return []  
+@app.route('/wage', methods=['GET'])
+def get_wage():
+    query = 'SELECT * FROM Wage'
+    result = execute_query(query)
+    if 'error' in result:
+        return jsonify(result), 500
+    else:
+        wage_data = [{'day': row[0], 'role': row[1], 'wage': row[2]} for row in result]
+        return jsonify({'wage': wage_data})
 
-    finally:
-        if cursor:
-            cursor.close()
-        if connection:
-            connection.close()
-
-@app.route('/') 
-def index(): 
-    wage = get_wage()
-    return json.dumps({'wage': wage})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
