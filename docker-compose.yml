@@ -2,24 +2,31 @@ version: '3.9'  # Docker Compose version
 
 services:
   # Backend service 
-  backend:
-    build: .  
+  flask-app:
+    container_name: flask-app
+    build: src # from dockerfile in src directory
+    links:
+      - mysql-db  # Link the Flask app container to MySQL container
     ports:
-      - "5000:5000"  # Map Flask app port 
+      - "5001:5000"  # Map Flask app port 
     volumes:
       - ./src:/app  # Mount your source code directory to /app inside container
     depends_on:
-      - mysql  
+      - mysql-db
 
 
-  mysql:
-    image: mysql:latest  
+  mysql-db:
+    container_name: mysql-db
+    image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: xxx  
-      MYSQL_DATABASE: mflg  
+      MYSQL_ROOT_PASSWORD: root #shift to env later on
+      MYSQL_DATABASE: mflg
+    ports:
+      - "3307:3306"  # Map MySQL port
     volumes:
-      - mysql_data:/var/lib/mysql  # Persist database data using a volume
-
-volumes:
-  # Volume to persist MySQL data
-  mysql_data: {}
+      - ./mysql_db/custom.cnf:/etc/mysql/conf.d/custom.cnf # Custom MySQL configuration file
+      - ./mysql_db:/docker-entrypoint-initdb.d/:ro # runs all .sql script from docker entrypoint
+      - ./data:/data/csv  # Mount data directory to /data/csv inside container
+    restart: always
+    command: 
+      - '--local-infile=1' # Enable local infile
