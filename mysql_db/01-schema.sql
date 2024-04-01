@@ -7,8 +7,8 @@ CREATE TABLE IF NOT EXISTS Employees (
   age INT NOT NULL,
   email VARCHAR(50) NOT NULL,
   gender ENUM('M', 'F') NOT NULL,
-  primary_role ENUM('Manager', 'Server', 'Cook', 'Dishwasher'),
-  secondary_role ENUM('Manager', 'Server', 'Cook', 'Dishwasher'),
+  primary_role ENUM('Manager', 'Service', 'Kitchen'),
+  secondary_role ENUM('Manager', 'Service', 'Kitchen'),
   wage DECIMAL(10,2), 
   status ENUM('Part time', 'Full time'),
   address VARCHAR(256)
