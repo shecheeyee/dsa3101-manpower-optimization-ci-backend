@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS DemandForecast (
   Date TEXT,
   Day TEXT,
   Time TEXT,
-  expectedCustomers INT,
+  expectedCustomers INT
 );
 
 CREATE TABLE IF NOT EXISTS SummaryStats (
