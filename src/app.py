@@ -48,16 +48,6 @@ def get_wage():
 
 @app.route("/post_demand_forecast", methods=["POST"])
 def store_demand_forecast():
-    execute_query(
-        """
-        CREATE TABLE IF NOT EXISTS DemandForecast (
-            Date TEXT,
-            Day TEXT,
-            Time TEXT,
-            expectedCustomers INT
-        )
-    """
-    )
     # Get the forecast data
     forecast_demand = demand_forecast()
 
