@@ -50,10 +50,10 @@ CREATE TABLE IF NOT EXISTS Events (
 );
 
 CREATE TABLE IF NOT EXISTS DemandForecast (
-  date DATE PRIMARY KEY,
-  expectedCustomers INT NOT NULL,
-  peakHours VARCHAR(50),
-  weather ENUM('Rain', 'Sun', 'Storm')
+  Date TEXT,
+  Day TEXT,
+  Time TEXT,
+  expectedCustomers INT,
 );
 
 CREATE TABLE IF NOT EXISTS SummaryStats (
