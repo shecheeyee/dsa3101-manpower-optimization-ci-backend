@@ -40,9 +40,10 @@ with open("expected_customers.json") as f:
 with open("public_holidays.json") as f:
     public_holidays = json.load(f)
 
+
 # Get's the rain chance of current day and the next 4 days
 def weather_forecast():
-    api_key = os.environ.get("OPENWEATHERMAP_API_KEY")
+    api_key = "745e49dcd551b66c18a13052f7852b0a"
     lat = 1.251675284654383  # lat and lon of good old days
     lon = 103.81719661065192
     url = f"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={api_key}"
@@ -91,13 +92,8 @@ def demand_forecast():
             )
         )
 
-    # Try to get weather data
-    weather_data = None
-    try:
-        weather_data = weather_forecast()
-    except Exception as e:
-        print(f"Failed to fetch weather data: {e}")
-
+    # Get weather data
+    weather_data = weather_forecast()
     forecast_demand = []
     for curr_date, curr_day in seven_day_prediction:
         # check if today is a public holiday
@@ -114,18 +110,17 @@ def demand_forecast():
             hourly_demand.append(customers[day_index])
 
         # get rain chance data, and adjust demand accordingly
-        if weather_data is not None:
-            if curr_date in weather_data.keys(): # This is for the first 5 dates (i.e. those that are in weather data)
-                rain_3h = weather_data.get(curr_date)
-                for time, rain_chance in rain_3h:
-                    # If Rain before 9am, the 10 and 11 am demand data * 0.7
-                    if time == "09:00:00" and rain_chance > 0.5:
-                        for i in range(2):
-                            hourly_demand[i] = round(hourly_demand[i] * 0.7)  # 0.7 hardcoded
-                    # elif (no rain before 9am) AND (rain after 12pm), the 12 - 9 pm demand * 1.10
-                    elif time != "09:00:00" and rain_chance > 0.5:
-                        for i in range(2, 12):
-                            hourly_demand[i] = round(hourly_demand[i] * 1.10)  # 1.10 hardcoded
+        if (curr_date in weather_data.keys()):  # This is for the first 5 dates (i.e. those that are in weather data)
+            rain_3h = weather_data.get(curr_date)
+            for time, rain_chance in rain_3h:
+                # If Rain before 9am, the 10 and 11 am demand data * 0.7
+                if time == "09:00:00" and rain_chance > 0.5:
+                    for i in range(2):
+                        hourly_demand[i] = round(hourly_demand[i] * 0.7)  # 0.7 hardcoded
+                # elif (no rain before 9am) AND (rain after 12pm), the 12 - 9 pm demand * 1.10
+                elif time != "09:00:00" and rain_chance > 0.5:
+                    for i in range(2, 12):
+                        hourly_demand[i] = round(hourly_demand[i] * 1.10)  # 1.10 hardcoded
 
         # Append to forecast_demand
         for i, hourly_customers in enumerate(hourly_demand):
