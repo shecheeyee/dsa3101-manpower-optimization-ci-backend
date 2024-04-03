@@ -1,12 +1,11 @@
 # demand forecasting model
 import os
 import json
-from flask import Flask, jsonify
+from flask import jsonify
 from dotenv import load_dotenv
 import requests
 from datetime import datetime, timedelta
 
-app = Flask(__name__)
 load_dotenv()
 
 """
@@ -35,15 +34,19 @@ DemandForecast table:
 | 2024-01-01 | Tuesday | 16:00:00 | 30                 |
 """
 
-# expected_customers data
-parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# # expected_customers data
+# parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# # Load expected customers data
+# with open(os.path.join(parent_dir, "data", "expected_customers.json")) as f:
+#     expected_customers = json.load(f)
+# # Load public holidays data
+# with open(os.path.join(parent_dir, "data", "public_holidays.json")) as f:
+#     public_holidays = json.load(f)
 
-# Load expected customers data
-with open(os.path.join(parent_dir, "data", "expected_customers.json")) as f:
+# Loading expected customers and public holidays data, if these 2 files are in the same directory as this file
+with open("expected_customers.json") as f:
     expected_customers = json.load(f)
-
-# Load public holidays data
-with open(os.path.join(parent_dir, "data", "public_holidays.json")) as f:
+with open("public_holidays.json") as f:
     public_holidays = json.load(f)
 
 
@@ -138,7 +141,3 @@ def demand_forecast():
                 [curr_date, curr_day, f"{i+10}:00:00", hourly_customers]
             )
     return forecast_demand
-
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
