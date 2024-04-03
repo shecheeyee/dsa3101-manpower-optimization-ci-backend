@@ -34,35 +34,23 @@ DemandForecast table:
 | 2024-01-01 | Tuesday | 16:00:00 | 30                 |
 """
 
-# # expected_customers data
-# parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-# # Load expected customers data
-# with open(os.path.join(parent_dir, "data", "expected_customers.json")) as f:
-#     expected_customers = json.load(f)
-# # Load public holidays data
-# with open(os.path.join(parent_dir, "data", "public_holidays.json")) as f:
-#     public_holidays = json.load(f)
-
 # Loading expected customers and public holidays data, if these 2 files are in the same directory as this file
 with open("expected_customers.json") as f:
     expected_customers = json.load(f)
 with open("public_holidays.json") as f:
     public_holidays = json.load(f)
 
-
+# Get's the rain chance of current day and the next 4 days
 def weather_forecast():
     api_key = os.environ.get("OPENWEATHERMAP_API_KEY")
     lat = 1.251675284654383  # lat and lon of good old days
     lon = 103.81719661065192
-    # today_date = datetime.now().strftime("%Y-%m-%d")
     url = f"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={api_key}"
     response = requests.get(url)
 
     if response.status_code == 200:
         data = response.json()
-        daily_rain_chance = (
-            dict()
-        )  # List to store {date: [rain_chance_9am, rain_chance_12noon, rain_chance_3pm, rain_chance_6pm]}
+        daily_rain_chance = (dict())  # List to store {date: [rain_chance_9am, rain_chance_12noon, rain_chance_3pm, rain_chance_6pm]}
 
         for item in data["list"]:
             date = item["dt_txt"].split(" ")[0]
@@ -78,7 +66,7 @@ def weather_forecast():
         return jsonify({"error": "Failed to fetch weather forecast"}), 500
 
 
-# Endpoint to get demand forecast
+# Generates demand forecast for the next 7 days, however, only the demand of the first five days will be influenced by the weather data
 def demand_forecast():
     """
     1. Date, Day: Get today's date and day
@@ -88,28 +76,30 @@ def demand_forecast():
                   if rain chance >50% at 9am, demand *0.7:
                   if rain chance <50% at 9am AND rain chance > 50% ANY TIME after 12pm, demand *1.10
                   else demand same
-    3. Weather:
-          if rain_chance[9am, 12noon, 3pm, 6pm] > 50% : rainy
-          else: sunny
-    4. Store data in sql
+    3. Return data in the format of [Date, Day, Time, expectedCustomers]
     """
     current_date = datetime.now().strftime("%Y-%m-%d")  # Get the current date
     current_day = datetime.now().strftime("%A")  # Get the current day of the week
 
-    # get today's date + next 4 days (e.g. [(2024-03-29, Thursday), (2024-03-30, Friday), (2024-03-31, Saturday), (2024-04-01, Sunday), (2024-04-02, Monday)] )
-    five_day_prediction = [(current_date, current_day)]
-    for i in range(1, 5):
-        five_day_prediction.append(
+    # get today's date + next 6 days (e.g. [(2024-03-29, Thursday), (2024-03-30, Friday), (2024-03-31, Saturday), (2024-04-01, Sunday), (2024-04-02, Monday), (2024-04-03, Tuesday), (2024-04-04, Wednesday)] )
+    seven_day_prediction = [(current_date, current_day)]
+    for i in range(1, 7):
+        seven_day_prediction.append(
             (
                 (datetime.now() + timedelta(days=i)).strftime("%Y-%m-%d"),
                 (datetime.now() + timedelta(days=i)).strftime("%A"),
             )
         )
 
-    # get weather data
-    weather_data = weather_forecast()
+    # Try to get weather data
+    weather_data = None
+    try:
+        weather_data = weather_forecast()
+    except Exception as e:
+        print(f"Failed to fetch weather data: {e}")
+
     forecast_demand = []
-    for curr_date, curr_day in five_day_prediction:
+    for curr_date, curr_day in seven_day_prediction:
         # check if today is a public holiday
         hourly_demand = []
         day_index = None
@@ -123,19 +113,21 @@ def demand_forecast():
         for _, customers in expected_customers.items():
             hourly_demand.append(customers[day_index])
 
-        # get rain chance data
-        rain_3h = weather_data.get(curr_date)
-        for time, rain_chance in rain_3h:
-            # Rain before 9am
-            if time == "09:00:00" and rain_chance > 0.5:
-                # 10,11 am demand *0.7
-                for i in range(2):
-                    hourly_demand[i] = round(hourly_demand[i] * 0.7)  # 0.7 hardcoded
-            # No rain before 9am and rain after 12pm
-            elif time != "09:00:00" and rain_chance > 0.5:
-                # 12 - 9 pm demand * 1.10
-                for i in range(2, 12):
-                    hourly_demand[i] = round(hourly_demand[i] * 1.10)  # 1.10 hardcoded
+        # get rain chance data, and adjust demand accordingly
+        if weather_data is not None:
+            if curr_date in weather_data.keys(): # This is for the first 5 dates (i.e. those that are in weather data)
+                rain_3h = weather_data.get(curr_date)
+                for time, rain_chance in rain_3h:
+                    # If Rain before 9am, the 10 and 11 am demand data * 0.7
+                    if time == "09:00:00" and rain_chance > 0.5:
+                        for i in range(2):
+                            hourly_demand[i] = round(hourly_demand[i] * 0.7)  # 0.7 hardcoded
+                    # elif (no rain before 9am) AND (rain after 12pm), the 12 - 9 pm demand * 1.10
+                    elif time != "09:00:00" and rain_chance > 0.5:
+                        for i in range(2, 12):
+                            hourly_demand[i] = round(hourly_demand[i] * 1.10)  # 1.10 hardcoded
+
+        # Append to forecast_demand
         for i, hourly_customers in enumerate(hourly_demand):
             forecast_demand.append(
                 [curr_date, curr_day, f"{i+10}:00:00", hourly_customers]
