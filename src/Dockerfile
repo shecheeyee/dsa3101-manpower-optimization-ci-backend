@@ -1,12 +1,13 @@
 FROM python:latest
 
+WORKDIR /app
+
+COPY requirements.txt /app/requirements.txt
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . /app
+
 EXPOSE 5001
 
-COPY . /src
-
-WORKDIR /src
-
-RUN pip install -r requirements.txt
-
-COPY app.py /src
-CMD python app.py
+CMD ["python", "app.py"]
