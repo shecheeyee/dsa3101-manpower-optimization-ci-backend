@@ -11,6 +11,7 @@ services:
       - "5001:5000"  # Map Flask app port 
     volumes:
       - ./src:/app  # Mount your source code directory to /app inside container
+      - ./data:/data  # Mount your source code directory to /app inside container
     depends_on:
       - mysql-db
 
