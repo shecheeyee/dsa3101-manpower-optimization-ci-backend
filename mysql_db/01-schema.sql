@@ -50,9 +50,9 @@ CREATE TABLE IF NOT EXISTS Events (
 );
 
 CREATE TABLE IF NOT EXISTS DemandForecast (
-  Date TEXT,
-  Day TEXT,
-  Time TEXT,
+  Date DATE,
+  Day  VARCHAR(50),
+  Time TIME,
   expectedCustomers INT
 );
 
