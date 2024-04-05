@@ -1,4 +1,4 @@
-emp_id,first_name,last_name,age,email,gender,primary_role,secondary_role,wage,status,address
+emp_id,first_name,last_name,dob,email,gender,primary_role,secondary_role,wage,status,address
 1,Charin,Sneller,1994-04-11,csneller0@ox.ac.uk,M,Manager,Manager,4818.28,Full time,3 Prentice Point
 2,Karna,Topping,1979-05-12,ktopping1@si.edu,M,Kitchen,Kitchen,3910.96,Full time,9 Summerview Park
 3,Lindon,Kyncl,1977-11-11,lkyncl2@mysql.com,M,Service,Service,0,Part time,9063 American Street

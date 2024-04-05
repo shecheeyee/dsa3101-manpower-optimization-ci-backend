@@ -1,21 +1,21 @@
 event_id,date,event_type,event_name,num_pax,time,duration
-1,3/1/24,Random,Wings of Time,52,15:24:00,1
-2,4/1/24,Wings of time,Others,61,13:37:00,2
-3,6/1/24,Random,Wings of Time,25,18:15:00,1
-4,6/1/24,Tour,Wings of Time,57,20:26:00,2
-5,7/1/24,Random,Wings of Time,31,12:10:00,3
-6,7/1/24,Company,Wings of Time,63,19:55:00,2
-7,10/1/24,Company,Wings of Time,23,12:42:00,2
-8,10/1/24,Wings of time,Others,96,18:24:00,1
-9,15/1/24,Random,Others,29,12:06:00,2
-10,19/1/24,Random,Others,85,20:28:00,1
-11,21/1/24,Wings of time,Wings of Time,89,13:12:00,2
-12,21/1/24,Wings of time,Wings of Time,70,19:19:00,2
-13,23/1/24,Company,Wings of Time,84,15:02:00,1
-14,23/1/24,Random,Others,76,19:48:00,2
-15,24/1/24,Company,Others,66,17:20:00,2
-16,25/1/24,Random,Wings of Time,55,18:06:00,3
-17,26/1/24,Company,Others,25,14:45:00,3
-18,27/1/24,Company,Others,79,20:17:00,3
-19,30/1/24,Tour,Wings of Time,63,16:58:00,3
-20,30/1/24,Random,Others,37,20:44:00,1
+1,2024-01-03,Wings of Time,Random,52,15:24:00,1
+2,2024-01-04,Others,Wings of time,61,13:37:00,2
+3,2024-01-06,Wings of Time,Random,25,18:15:00,1
+4,2024-01-06,Wings of Time,Tour,57,20:26:00,2
+5,2024-01-07,Wings of Time,Random,31,12:10:00,3
+6,2024-01-07,Wings of Time,Company,63,19:55:00,2
+7,2024-01-10,Wings of Time,Company,23,12:42:00,2
+8,2024-01-10,Others,Wings of time,96,18:24:00,1
+9,2024-01-15,Others,Random,29,12:06:00,2
+10,2024-01-19,Others,Random,85,20:28:00,1
+11,2024-01-21,Wings of Time,Wings of time,89,13:12:00,2
+12,2024-01-21,Wings of Time,Wings of time,70,19:19:00,2
+13,2024-01-23,Wings of Time,Company,84,15:02:00,1
+14,2024-01-23,Others,Random,76,19:48:00,2
+15,2024-01-24,Others,Company,66,17:20:00,2
+16,2024-01-25,Wings of Time,Random,55,18:06:00,3
+17,2024-01-26,Others,Company,25,14:45:00,3
+18,2024-01-27,Others,Company,79,20:17:00,3
+19,2024-01-30,Wings of Time,Tour,63,16:58:00,3
+20,2024-01-30,Others,Random,37,20:44:00,1
