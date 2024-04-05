@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS Employees (
   emp_id INT PRIMARY KEY AUTO_INCREMENT,
   first_name VARCHAR(50) NOT NULL,
   last_name VARCHAR(50) NOT NULL,
-  age INT NOT NULL,
+  dob DATE NOT NULL,
   email VARCHAR(50) NOT NULL,
   gender ENUM('M', 'F') NOT NULL,
   primary_role ENUM('Manager', 'Service', 'Kitchen'),
@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS Schedules (
 CREATE TABLE IF NOT EXISTS Events (
   event_id INT PRIMARY KEY AUTO_INCREMENT,
   date DATE NOT NULL,
-  event_type VARCHAR(50),
+  event_type ENUM('Wings of Time', 'Others'),
   event_name VARCHAR(50) NOT NULL,
   num_pax INT,
   time TIME NOT NULL,
@@ -54,6 +54,13 @@ CREATE TABLE IF NOT EXISTS DemandForecast (
   Day  VARCHAR(50),
   Time TIME,
   expectedCustomers INT
+);
+
+CREATE TABLE IF NOT EXISTS PastDemand (
+  Date DATE,
+  Day  VARCHAR(50),
+  Time TIME,
+  actualCustomers INT
 );
 
 CREATE TABLE IF NOT EXISTS SummaryStats (
