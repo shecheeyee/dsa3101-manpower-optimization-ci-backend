@@ -5,6 +5,10 @@ from flask import jsonify
 from dotenv import load_dotenv
 import requests
 from datetime import datetime, timedelta
+from db_utils import execute_query
+from darts import TimeSeries
+from darts.models import ARIMA
+import pandas as pd
 
 load_dotenv()
 
@@ -33,17 +37,61 @@ DemandForecast table:
 | 2024-01-01 | Tuesday | 15:00:00 | 45                 |
 | 2024-01-01 | Tuesday | 16:00:00 | 30                 |
 """
+"""
+Flow:
+PastDemand -> time series prediction model -> Alter with Weather data -> DemandForecast
+"""
 
-# Loading expected customers and public holidays data, if these 2 files are in the same directory as this file
-with open("expected_customers.json") as f:
+# Loading expected customers and public holidays data
+with open("../data/json/expected_customers.json") as f:
     expected_customers = json.load(f)
-with open("public_holidays.json") as f:
+with open("../data/json/public_holidays.json") as f:
     public_holidays = json.load(f)
 
+# Fetch PastDemand data
+def get_past_demand():
+    query = "SELECT * FROM PastDemand"
+    result = execute_query(query)
+    past_demand_data = [{'Date': str(row[0]), 'Day': row[1], 'Time': str(row[2]), "Customers": row[3]} for row in result]
+    df = pd.DataFrame(past_demand_data)
+    return df
+
+# # For testing locally
+# def get_past_demand():
+#     df = pd.read_csv("../data/csv/04-mock_customer_demand_past.csv", index_col=False)
+#     return df
+
+# Fit PastDemand data into model and predict next week's demand
+# # I'll be using Darts library for time series forecasting: Documentation: https://unit8co.github.io/darts/
+def arima_next_week_demand():
+    past_demand_df = get_past_demand() # Get past demand data
+
+    # Wrangle data into TimeSeries format
+    past_demand_df["DateTime"] = pd.to_datetime(past_demand_df["Date"] + " " + past_demand_df["Time"])
+    past_demand_df = past_demand_df.drop(columns=["Date", "Time"])
+    # Convert to TimeSeries object. Because the data is only from 10am to 9pm, need to fill the missing time slots with 0.
+    past_demand_df = TimeSeries.from_dataframe(past_demand_df, time_col="DateTime", value_cols="Customers", fill_missing_dates=True, freq="H", fillna_value=0)
+
+    # ARIMA model
+    model = ARIMA(p=24)
+    model.fit(past_demand_df)
+    prediction = model.predict(168)
+
+    # Wrangle prediction data into the format of DemandForecast table
+    prediction_df = TimeSeries.pd_dataframe(prediction)
+    prediction_df["DateTime"] = prediction_df.index
+    prediction_df["Date"] = prediction_df["DateTime"].dt.strftime("%Y-%m-%d")
+    prediction_df["Time"] = prediction_df["DateTime"].dt.strftime("%H:%M:%S")
+    prediction_df["Day"] = prediction_df["DateTime"].dt.strftime("%A")
+    prediction_df["ExpectedCustomers"] = prediction_df["Customers"].astype(int)
+    prediction_df = prediction_df.drop(columns=["DateTime", "Customers"])
+    opening_hours = ["10:00:00", "11:00:00", "12:00:00", "13:00:00", "14:00:00", "15:00:00", "16:00:00", "17:00:00", "18:00:00", "19:00:00", "20:00:00", "21:00:00"]
+    prediction_df = prediction_df[prediction_df["Time"].isin(opening_hours)]    
+    return prediction_df
 
 # Get's the rain chance of current day and the next 4 days
 def weather_forecast():
-    api_key = "745e49dcd551b66c18a13052f7852b0a"
+    api_key = "745e49dcd551b66c18a13052f7852b0a" # Move to .env in future implementations
     lat = 1.251675284654383  # lat and lon of good old days
     lon = 103.81719661065192
     url = f"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={api_key}"
@@ -65,7 +113,6 @@ def weather_forecast():
         return daily_rain_chance
     else:
         return jsonify({"error": "Failed to fetch weather forecast"}), 500
-
 
 # Generates demand forecast for the next 7 days, however, only the demand of the first five days will be influenced by the weather data
 def demand_forecast():
@@ -125,6 +172,6 @@ def demand_forecast():
         # Append to forecast_demand
         for i, hourly_customers in enumerate(hourly_demand):
             forecast_demand.append(
-                [curr_date, curr_day, f"{i+10}:00:00", hourly_customers]
+                [curr_date, curr_day, f"{i+10}:00:00", int(max(0,hourly_customers))]
             )
     return forecast_demand
