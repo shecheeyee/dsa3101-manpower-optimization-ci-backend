@@ -74,6 +74,6 @@ CREATE TABLE IF NOT EXISTS SummaryStats (
 
 CREATE TABLE IF NOT EXISTS Wage (
     day ENUM('Weekday', 'Weekend', 'Public Holiday'),
-    role ENUM('Server', 'Cook', 'Dishwasher'),
+    role ENUM('Service', 'Kitchen'),
     wage DECIMAL(10,2) NOT NULL
 );
