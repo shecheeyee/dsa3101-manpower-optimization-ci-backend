@@ -36,12 +36,12 @@ with open('mock_customer_demand_past.csv', 'w', newline='') as csvfile:
 
   for day in range(days_back):
     current_date = start_date - timedelta(days=day)
-    print(current_date)
+    # print(current_date)
     date_str = current_date.strftime("%Y-%m-%d")
     day_of_week = current_date.strftime("%A")
 
     for hr in hrs:
-        print(hr)
+        # print(hr)
         hr_time = time(hour=int(hr[:2]), minute=0, second=0)
         time_str = hr_time.strftime("%H:%M:%S")
         idx = day_idx_mapping[day_of_week]
