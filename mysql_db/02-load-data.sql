@@ -1,30 +1,30 @@
 USE mflg;  -- Switch to your database
 
-LOAD DATA INFILE '/data/csv/00-mock_emp_details.csv'
+LOAD DATA INFILE '/var/lib/mysql-files/csv/00-mock_emp_details.csv'
 INTO TABLE Employees
 FIELDS TERMINATED BY ','  
 LINES TERMINATED BY '\n'  
 IGNORE 1 LINES;  
 
-LOAD DATA INFILE '/data/csv/01-mock_availability.csv'
+LOAD DATA INFILE '/var/lib/mysql-files/csv/01-mock_availability.csv'
 INTO TABLE Availability
 FIELDS TERMINATED BY ','  
 LINES TERMINATED BY '\n'  
 IGNORE 1 LINES;  
 
-LOAD DATA INFILE '/data/csv/02-mock_events.csv'
+LOAD DATA INFILE '/var/lib/mysql-files/csv/02-mock_events.csv'
 INTO TABLE Events
 FIELDS TERMINATED BY ','
 LINES TERMINATED BY '\n'
 IGNORE 1 LINES;
 
-LOAD DATA INFILE '/data/csv/03-mock_wage.csv'
+LOAD DATA INFILE '/var/lib/mysql-files/csv/03-mock_wage.csv'
 INTO TABLE Wage
 FIELDS TERMINATED BY ','
 LINES TERMINATED BY '\n'
 IGNORE 1 LINES;
 
-LOAD DATA INFILE '/data/csv/04-mock_customer_demand_past.csv'
+LOAD DATA INFILE '/var/lib/mysql-files/csv/04-mock_customer_demand_past.csv'
 INTO TABLE PastDemand
 FIELDS TERMINATED BY ','
 LINES TERMINATED BY '\n'
