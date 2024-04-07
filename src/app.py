@@ -6,7 +6,7 @@ from db_utils import execute_query
 from model.employee import  create_employee, update_employee, get_all_employees, delete_employee
 from demand_forecast import demand_forecast
 import json
-import csv
+import pandas as pd
 
 app = Flask(__name__)
 CORS(app)
@@ -48,24 +48,44 @@ def get_wage():
 
 @app.route("/post_demand_forecast", methods=["POST"])
 def store_demand_forecast():
-    # Get the forecast data
-    forecast_demand = demand_forecast()
+    try:
+        # Get the forecast data
+        forecast_demand = demand_forecast()
 
-    # Insert the forecast data into the database
-    for date, day, time, hourly_customers in forecast_demand:
-        field_names = f"Date, Day, Time, expectedCustomers"
-        field_values = f"'{date}', {day}, '{time}', '{hourly_customers}'"
-        query = f"INSERT INTO DemandForecast ({field_names}) VALUES ({field_values})"
-        execute_query(query)
-
-    return jsonify({"message": "Data stored successfully"})
-
+        # Insert the forecast data into the database
+        for date, day, time, hourly_customers in forecast_demand:
+            field_names = f"Date, Day, Time, expectedCustomers"
+            field_values = f"DATE'{date}', {day}, TIME '{time}', '{hourly_customers}'"
+            query = f"INSERT INTO DemandForecast ({field_names}) VALUES ({field_values})"
+            execute_query(query)
+        return jsonify({"message": "Data stored successfully"})
+    except Exception as e:
+        return jsonify({"error": str(e)})
 
 @app.route("/get_demand_forecast", methods=["GET"])
 def get_demand_forecast():
     query = "SELECT * FROM DemandForecast"
     result = execute_query(query)
-    return jsonify(result)
+    demand_forecast_data = [{'Date': row[0], 'Day': row[1], 'Time': str(row[2]), "actualCustomers": row[3]} for row in result]
+    return jsonify(demand_forecast_data)
+
+@app.route("/post_past_demand", methods=["POST"])
+def post_past_demand():
+    csv_file = request.files['file']
+    df = pd.read_csv(csv_file)
+    for index, row in df.iterrows():
+            field_names = f"Date, Day, Time, actualCustomers"
+            field_values = f"DATE '{row['Date']}', '{row['Day']}', TIME '{row['Time']}', '{row['Customers']}'"
+            query = f"INSERT INTO PastDemand ({field_names}) VALUES ({field_values})"
+            execute_query(query)
+    return jsonify({"message": "Data stored successfully"})
+
+@app.route("/get_past_demand", methods=["GET"])
+def get_past_demand():
+    query = "SELECT * FROM PastDemand"
+    result = execute_query(query)
+    past_demand_data = [{'Date': row[0], 'Day': row[1], 'Time': str(row[2]), "actualCustomers": row[3]} for row in result]
+    return jsonify(past_demand_data)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
