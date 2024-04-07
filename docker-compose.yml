@@ -21,13 +21,16 @@ services:
     image: mysql:8.0
     environment:
       MYSQL_ROOT_PASSWORD: root #shift to env later on
-      MYSQL_DATABASE: mflg
     ports:
       - "3307:3306"  # Map MySQL port
     volumes:
       - ./mysql_db/custom.cnf:/etc/mysql/conf.d/custom.cnf # Custom MySQL configuration file
-      - ./mysql_db:/docker-entrypoint-initdb.d/:ro # runs all .sql script from docker entrypoint
-      - ./data:/data/csv  # Mount data directory to /data/csv inside container
+      - ./mysql_db:/docker-entrypoint-initdb.d/:ro # runs all .sql script from docker entrypoint on container creation
+      - ./data:/data  # Mount data directory to /data/csv inside container
+      - mysql-data:/var/lib/mysql # persist data
     restart: always
     command: 
       - '--local-infile=1' # Enable local infile
+
+volumes:
+  mysql-data:
