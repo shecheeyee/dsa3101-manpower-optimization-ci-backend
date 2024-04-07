@@ -1,8 +1,7 @@
 import pymysql
 import pandas as pd
-from pyomo.environ import *
-from pyomo.opt import SolverFactory
-import os
+import numpy as np
+from pulp import *
 
 
 # Establish a secure connection to the MySQL database using pymysql
@@ -22,84 +21,180 @@ cursor = connection.cursor()
 cursor.execute("SELECT * FROM Wage")
 results = cursor.fetchall()
 
-for row in results:
-  print(row)
 
 cursor.execute("SELECT * FROM Employees")
 results2 = cursor.fetchall()
-for row in results2:
-  print(row)
 
 cursor.execute("SELECT * FROM Availability")
 results3 = cursor.fetchall()
-for row in results3:
-    print(row)
 
-availability = {} # dictionary to store availability data for the coming week.
+df_avail = pd.DataFrame(results3, columns =  ['id','week','Mon','Tue','Wed','Thu','Fri','Sat','Sun'])
 
+# Shift Algorithm
 
-df = pd.DataFrame(results2, columns = ['id', 'first_name', 'last_name', 'age', 'email', ' gender', 'primary_role', 'secondary_role', 'wage', 'status', 'address'])
-print(df)
-
-workers = df['id'].tolist()
-# Staff needs per Day
-# change inputs to demand forecast
-n_staff = [6, 6, 6, 6, 7, 7, 7]
-n_staff_server = [2, 2, 2, 2, 2, 2, 2]
-n_staff_cook =  [2, 2, 2, 2, 2, 2, 2]
-n_staff_dishwasher = [2, 2, 2, 2, 3, 3, 3]
-n_staff_manager = [1, 1, 1, 1, 1, 1, 1]
-# Define days (1 week)
+# Insert Demand Forecast Data here in the form of a dictionary
+data = {
+    '1000': [9, 42, 19, 11, 15, 9, 14],
+    '1100': [23, 79, 31, 22, 32, 22, 34],
+    '1200': [42, 100, 44, 38, 49, 3, 49],
+    '1300': [50, 99, 47, 48, 50, 46, 57],
+    '1400': [46, 77, 38, 38, 43, 49, 54],
+    '1500': [34, 45, 35, 29, 36, 40, 47],
+    '1600': [26, 30, 33, 25, 34, 36, 42],
+    '1700': [23, 25, 29, 26, 35, 42, 44],
+    '1800': [23, 28, 26, 29, 37, 50, 45],
+    '1900': [24, 20, 20, 24, 36, 47, 38],
+    '2000': [19, 14, 15, 20, 27, 31, 24],
+    '2100': [12, 7, 7, 10, 18, 13, 12]
+}
 days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+weekday = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']
+weekend = ['Sat', 'Sun']
 
-staff_per_day = {day: n_staff[days.index(day)] for day in days}
-server_per_day = {day: n_staff_server[days.index(day)] for day in days}
-cook_per_day = {day: n_staff_cook[days.index(day)] for day in days}
-dishwasher_per_day = {day: n_staff_dishwasher[days.index(day)] for day in days}
+df = pd.DataFrame(data, index=days)
+
+# Transpose the DataFrame to have times as rows and days as columns
+df_transposed = df.T
+print(df_transposed)
+
+# Array representing shifting hours
+timings = np.array([[1,0,1],
+                [1,1,1],
+                [0,1,1]])
+# number of shifts
+num_shifts = timings.shape[1]
+
+# number of time windows
+num_time = timings.shape[0]
+
+# Define your functions with assumed business rules
+def kitchen_required_func(x):
+    if x < 30:
+        return 3
+    elif x < 70:
+        return 4
+    else: 
+        return 5
+
+def service_required_func(x):
+    if x < 30:
+        return 4
+    elif x < 70:
+        return 5
+    else: 
+        return 6
+
+# Map the functions over all entries in the DataFrame and replace them
+df_kitchen_mapped = df_transposed.map(kitchen_required_func)
+df_service_mapped = df_transposed.map(service_required_func)
+
+time_windows_kitchen = {
+    'Morning': df_kitchen_mapped['1000':'1200'].max(),
+    'Afternoon' : df_kitchen_mapped['1200':'1800'].max(),
+    'Night': df_kitchen_mapped['1800':'2200'].max()
+}
+
+
+time_windows_service = {
+    'Morning': df_service_mapped['1000':'1200'].max(),
+    'Afternoon': df_service_mapped['1200':'1800'].max(),
+    'Night': df_service_mapped['1800':'2200'].max()
+}
+
+df_time_windows_kitchen = pd.DataFrame(time_windows_kitchen)
+df_time_windows_service = pd.DataFrame(time_windows_service)
+print("Kitchen: ", df_time_windows_kitchen,
+      '\n',
+        df_time_windows_service)
+
+kitchen_staff_dict = {}
+solver = PULP_CBC_CMD(msg=0)
+  # Suppress solver messages
+for day in days: 
+    temp_lst = list()
+    workers_per_shift = LpVariable.dicts("num_workers", list(range(num_shifts)), lowBound=0, cat="Integer")
+
+# Minimize the staff assigned for the aay
+    shift_problem = LpProblem("Shift Problem", LpMinimize)
+
+# Minimize the number of workers
+    shift_problem += lpSum(workers_per_shift[i] for i in range(num_shifts)), "Objective"
+
+    for t in range(num_time):
+        shift_problem += lpSum([timings[t, j] * workers_per_shift[j] for j in range(num_shifts)]) >= df_time_windows_kitchen.iloc[days.index(day),t]
+
+    shift_problem.solve(solver)
+
+    for shift in range(num_time):
+        temp_lst.append(workers_per_shift[shift].value())
+    kitchen_staff_dict[day] = temp_lst
+
+print(kitchen_staff_dict)
+
+service_staff_dict = {}
+
+for day in days: 
+    temp_lst = list()
+    workers_per_shift = LpVariable.dicts("num_workers", list(range(num_shifts)), lowBound=0, cat="Integer")
+
+# Minimize the staff assigned for the aay
+    shift_problem = LpProblem("Shift Problem", LpMinimize)
+
+# Minimize the number of workers
+    shift_problem += lpSum(workers_per_shift[i] for i in range(num_shifts)), "Objective"
+
+    for t in range(num_time):
+        shift_problem += lpSum([timings[t, j] * workers_per_shift[j] for j in range(num_shifts)]) >= df_time_windows_service.iloc[days.index(day),t]
+
+    shift_problem.solve(solver)
+
+    for shift in range(num_time):
+        temp_lst.append(workers_per_shift[shift].value())
+    service_staff_dict[day] = temp_lst
+
+print(service_staff_dict)
+
+# Scheduling Algorithm
+
+# Insert the data into a pandas DataFrame
+df = pd.DataFrame(results2, columns = ['id', 'first_name', 'last_name', 'age', 'email', ' gender', 'primary_role', 'secondary_role', 'wage', 'status', 'address'])
+df_wage = pd.DataFrame(results, columns = ['Day', 'Role', 'Wage'])
+
 
 # Enter shifts of each day
 shifts = ['morning', 'night', 'full']  
 days_shifts = {day: shifts for day in days}  # dict with day as key and list of its shifts as value
-shift_duration = {'morning': 8, 
-                  'night': 8,
-                  'full': 12}  # dict with shift as key and its duration in hours as value
+service_shift_duration = {1: 8, 
+                  2: 8,
+                  3: 12}  # dict with shift as key and its duration in hours as value
 # Cook run on different shifts
-cook_shift_duration = {'morning': 10, 
-                       'night': 10,
-                       'full': 14}  # dict with shift as key and its duration in hours as value
-pt_ph_wage = 15 # so can edit
-pt_salary = {'Mon' : 13, 
-           'Tue' : 13, 
-           'Wed' : 13, 
-           'Thu' : 13, 
-           'Fri' : 14, 
-           'Sat' : 14, 
-           'Sun' : 14
-}
+kitchen_shift_duration = {1: 10, 
+                       2: 10,
+                       3: 14}  # dict with shift as key and its duration in hours as value
 
-cook_ph_wage = 16
-cook_pt_salary = {'Mon' : 14, 
-           'Tue' : 14, 
-           'Wed' : 14, 
-           'Thu' : 14, 
-           'Fri' : 15, 
-           'Sat' : 15, 
-           'Sun' : 15
-}
 
-roles = ['Cook', 'Dishwasher', 'Manager', 'Server']
-
-def pt_wage(day,shift, boo = False): #boo if Public Holiday
-    duration = shift_duration[shift]
+def retrieve_pt_wage(day,role,boo = False):
     if boo:
-        return pt_ph_wage * duration
-    return pt_salary[day] * duration
+        return df_wage.loc[(df_wage['Day'] == 'Public Holiday') & (df_wage['Role'] == role), 'Wage'].iloc[0]
+    elif day in weekday:
+        return df_wage.loc[(df_wage['Day'] == 'Weekday') & (df_wage['Role'] == role), 'Wage'].iloc[0]
+    else:
+        return df_wage.loc[(df_wage['Day'] == 'Weekend') & (df_wage['Role'] == role), 'Wage'].iloc[0]
+ 
 
-def cook_pt_wage(day,shift, boo = False): #boo if Public Holiday
-    duration = cook_shift_duration[shift]
-    if boo:
-        return cook_ph_wage * duration
-    return cook_pt_salary[day] * duration
+
+
+def shift_duration(workerid,shiftindex):
+    status = get_status(workerid)
+    role = get_role(workerid)
+    if status: 
+        return 0
+    else: 
+        if role == 'Kitchen':
+            return kitchen_shift_duration[shiftindex]
+        else:
+            return service_shift_duration[shiftindex]
+        
 
 def get_status(worker_id):
     status = df[df['id'] == worker_id]['status'].iloc[0]
@@ -108,9 +203,7 @@ def get_status(worker_id):
 def get_wage(worker_id,day,shift):
     cost = 0
     if not get_status(worker_id):
-        if get_role(worker_id) == 'Cook':
-            cost = cook_pt_wage(day,shift)
-        cost = pt_wage(day,shift)
+        cost = retrieve_pt_wage(day,get_role(worker_id)) * shift_duration(worker_id,shift)
     return cost
 
 def get_role(worker_id):
@@ -118,189 +211,114 @@ def get_role(worker_id):
 
 def get_sec_role(worker_id):
     return df[df['id'] == worker_id]['secondary_role'].iloc[0]
-    
+
+# index availability data function
+def get_avail(workerid, day,shifttype):
+    day_value = df_avail.loc[df_avail['id'] == workerid][day].values[0]
+    if day_value == 0:
+        return 0
+    elif day_value == 1:
+        return 1 if shifttype == 1 else 0
+    elif day_value == 2:
+        return 1 if shifttype == 2 else 0
+    elif day_value == 3:
+        return 1
+
+
+def shift_duration(workerid, shift):
+    status = get_status(workerid)
+    role = get_role(workerid)
+    if status: 
+        return 0
+    else: 
+        if role == 'Kitchen':
+            return kitchen_shift_duration[shift]
+        else:
+            return service_shift_duration[shift]
+        
+
+def kitchen_required(day, shift):
+    return kitchen_staff_dict[day][shift-1]
+
+def service_required(day, shift):
+    return service_staff_dict[day][shift-1]
 
 workers = df['id'].tolist()  # 10 workers available, more than needed
 ft_workers = [worker for worker in workers if get_status(worker)]
 pt_workers = [worker for worker in workers if not get_status(worker)]
-cooks = [worker for worker in workers if get_role(worker) == 'Cook' ]
-servers = [worker for worker in workers if get_role(worker) == 'Server']
-dishwashers = [worker for worker in workers if get_role(worker) == 'Dishwasher']
+kitchen_workers = [worker for worker in workers if get_role(worker) == 'Kitchen']
+server_workers = [worker for worker in workers if get_role(worker) == 'Service']
 managers = [worker for worker in workers if get_role(worker) == 'Manager']
 
-model = ConcreteModel()
-model.DAYS = Set(initialize=days)
-model.SHIFTS = Set(initialize=shifts)
-model.WORKERS = Set(initialize=workers)
-model.PTWORKERS = Set(initialize=pt_workers)
-model.FTWORKERS = Set(initialize=ft_workers)
-model.COOKS = Set(initialize=cooks)
-model.SERVERS = Set(initialize=servers)
-model.DISHWASHERS = Set(initialize=dishwashers)
-model.MANAGERS = Set(initialize=managers)
 
-availability = {(worker, day, shift): 1 for worker in workers for day in days for shift in shifts} # Remove later
-# Set availability to 1 for all workers on all days and shifts initially
+problem = LpProblem("Minimize Staff Costs", LpMinimize)
 
-# read in availability data
-
-# Define decision variables (assigning workers to shifts)
-model.assignment = Var(model.WORKERS, model.DAYS, model.SHIFTS, domain = Binary, initialize = 0)
-
-model.cost = Objective(
-    expr=sum(get_wage(worker,day,shift) * model.assignment[worker, day, shift]
-             for worker in workers for day in days for shift in shifts),
-    sense=minimize
-)
-
-model.constraints = ConstraintList()
-def availability_constraint(model, worker, day, shift):
-    return model.assignment[worker, day, shift] <= availability[worker, day, shift]
+morning_shift = LpVariable.dicts('Morning', [(day,worker) for worker in workers for day in days], cat ='Binary')
+night_shift = LpVariable.dicts('Night', [(day,worker) for worker in workers for day in days], cat ='Binary')
+full_shift = LpVariable.dicts('Full', [(day,worker) for worker in workers for day in days],cat ='Binary')
 
 
-model.availability_constraint = Constraint(
-    model.WORKERS, model.DAYS,model.SHIFTS, rule=availability_constraint
-)
-
-def one_shift_per_day_constraint_rule(model, worker, day):
-    return sum(model.assignment[worker, day, shift] for shift in shifts) <= 1   
-
-model.one_shift_per_day_constraint = Constraint(
-    model.WORKERS, model.DAYS, rule=one_shift_per_day_constraint_rule
-)
-
-
-def server_shift_constraint_rule(model, day):
-    # Calculate the total number of assigned workers for morning and night shifts
-    total_assigned_workers_morning = sum(model.assignment[worker, day, s] for worker in model.SERVERS for s in ['morning','full'])
-    required_workers_count = server_per_day[day]  # Get the required number of workers for the shift
-
-    return total_assigned_workers_morning == required_workers_count     
-
-def server_shift_constraint_rule_night(model, day):
-    # Calculate the total number of assigned workers for morning and night shifts
-    total_assigned_workers_morning = sum(model.assignment[worker, day, s] for worker in model.SERVERS for s in ['night','full'])
-    required_workers_count = server_per_day[day]  # Get the required number of workers for the shift
-
-    return total_assigned_workers_morning == required_workers_count 
-
-model.server_shift_constraint = Constraint(
-    model.DAYS, rule=server_shift_constraint_rule
-)
-
-model.server_shift_constraint_night = Constraint(
-    model.DAYS, rule=server_shift_constraint_rule_night
-)
-
-def cook_shift_constraint_rule(model, day):
-    # Calculate the total number of assigned workers for morning and night shifts
-    total_assigned_workers_morning = sum(model.assignment[worker, day, s] for worker in model.COOKS for s in ['morning','full'])
-    required_workers_count = cook_per_day[day]  # Get the required number of workers for the shift
-
-    return total_assigned_workers_morning == required_workers_count
-
-def cook_shift_constraint_rule_night(model, day):
-    # Calculate the total number of assigned workers for morning and night shifts
-    total_assigned_workers_morning = sum(model.assignment[worker, day, s] for worker in model.COOKS for s in ['night','full'])
-    required_workers_count = cook_per_day[day]  # Get the required number of workers for the shift
-
-    return total_assigned_workers_morning == required_workers_count
-
-model.cook_shift_constraint = Constraint(
-    model.DAYS, rule=cook_shift_constraint_rule
-)
-
-model.cook_shift_constraint_night = Constraint(
-    model.DAYS, rule=cook_shift_constraint_rule_night
-)
-
-def dishwasher_shift_constraint_rule(model, day):
-    # Calculate the total number of assigned workers for morning and night shifts
-    total_assigned_workers_morning = sum(model.assignment[worker, day, s] for worker in model.DISHWASHERS for s in ['morning','full'])
-    required_workers_count = dishwasher_per_day[day]  # Get the required number of workers for the shift
-
-    return total_assigned_workers_morning == required_workers_count
-
-def dishwasher_shift_constraint_rule_night(model, day):
-    # Calculate the total number of assigned workers for morning and night shifts
-    total_assigned_workers_morning = sum(model.assignment[worker, day, s] for worker in model.DISHWASHERS for s in ['night','full'])
-    required_workers_count = dishwasher_per_day[day]  # Get the required number of workers for the shift
-
-    return total_assigned_workers_morning == required_workers_count
-
-model.dishwasher_shift_constraint = Constraint(
-    model.DAYS, rule=dishwasher_shift_constraint_rule
-)
-
-def manager_shift_constraint_rule(model, day):
-    # Calculate the total number of assigned workers for morning and night shifts
-    total_assigned_workers_morning = sum(model.assignment[worker, day, s] for worker in model.MANAGERS for s in ['morning','full'])
-    required_workers_count = 1  # Get the required number of workers for the shift
-
-    return total_assigned_workers_morning == required_workers_count
-
-def manager_shift_constraint_rule_night(model, day):
-    # Calculate the total number of assigned workers for morning and night shifts
-    total_assigned_workers_morning = sum(model.assignment[worker, day, s] for worker in model.MANAGERS for s in ['night','full'])
-    required_workers_count = 1  # Get the required number of workers for the shift
-
-    return total_assigned_workers_morning == required_workers_count
-
-model.manager_shift_constraint = Constraint(
-    model.DAYS, rule=manager_shift_constraint_rule
-)
-
-model.manager_shift_constraint_night = Constraint(
-    model.DAYS, rule=manager_shift_constraint_rule_night
-)
-
-model.dishwasher_shift_constraint_night = Constraint(
-    model.DAYS, rule=dishwasher_shift_constraint_rule_night
-)
-
-def parttime_hours_constraint(model, worker):
-    total_hours = sum(model.assignment[worker, day, shift] * shift_duration[shift]
-                      for day in model.DAYS for shift in model.SHIFTS)
-    return total_hours <= 35
-    
-model.pt_workers_constraints = Constraint(
-    model.PTWORKERS, rule=parttime_hours_constraint
-)
-
-def fulltime_hours_constraint(model, worker):
-    total_hours = sum(model.assignment[worker, day, shift] * shift_duration[shift]
-                      for day in model.DAYS for shift in model.SHIFTS)
-    return total_hours <= 44
-model.ft_workers_constraints = Constraint(
-    model.FTWORKERS, rule=fulltime_hours_constraint
-)
-
-
-
-
-model.fulltime_hours_constraint = Constraint(
-    model.FTWORKERS, rule=fulltime_hours_constraint
-)
-
-
-
-# Set NEOS_EMAIL environment variable
-os.environ['NEOS_EMAIL'] = 'e0773196@u.nus.edu'
-solver = SolverFactory('cbc')  # Select solver
-solver_manager = SolverManagerFactory('neos') 
-
-# Solve the model
-result = solver_manager.solve(model, opt = solver)
-
-# Print optimized results  
-# Change to other format of returning results later
-if result.solver.termination_condition == 'optimal':
-    print('Optimal solution found:')
+for day in days:
     for worker in workers:
-        for day in days:
-            for shift in shifts:
-                if model.assignment[worker, day, shift].value == 1:
-                    print(f"Worker {worker} assigned to {shift} shift on {day}.")
-    print('Total cost:', model.cost())
-else:
-    print('No optimal solution found.')
+        morning_shift[(day, worker)].setInitialValue(0)
+        night_shift[(day, worker)].setInitialValue(0)
+        full_shift[(day, worker)].setInitialValue(0)
+
+# Objective function to minimize overall wage
+objective = lpSum(get_wage(worker, day, shift_type) * (
+    morning_shift[(day, worker)] if shift_type == 1 else
+    night_shift[(day, worker)] if shift_type == 2 else
+    full_shift[(day, worker)]
+) for day in days for worker in workers for shift_type in range(1, 4))
+
+
+# Worker can only work one shift a day Constraint
+for i in days:
+    for j in workers:
+        problem += lpSum([morning_shift[(i,j)], night_shift[(i,j)], full_shift[(i,j)]]) <= 1  # only one shift per day
+        problem += morning_shift[(i,j)] <= get_avail(j,i,1) #Availability Constraint
+        problem += night_shift[(i,j)] <= get_avail(j,i,2) #Availability Constraint
+        problem += full_shift[(i,j)] <= get_avail(j,i,3)
+
+for i in days:
+    for j in workers:
+        problem += lpSum([morning_shift[(i,j)], night_shift[(i,j)], full_shift[(i,j)]]) <= 1  # only one shift per day
+        problem += morning_shift[(i,j)] <= 1 #Availability Constraint
+        problem += night_shift[(i,j)] <= 1 #Availability Constraint
+        problem += full_shift[(i,j)] <= 1
+
+# Define the constraints for total hours worked in a week
+for j in workers:
+    worker_role = get_role(j)
+    status = get_status(j)  # pt or ft
+    hours_in_a_week = lpSum(
+        morning_shift[(i, j)] * shift_duration(j, 1) +
+        night_shift[(i, j)] * shift_duration(j, 2) +
+        full_shift[(i, j)] * shift_duration(j, 3) for i in days
+    )
+    problem += hours_in_a_week <= 44 if status else hours_in_a_week <= 35  # 44 hours for full time, 35 hours for part time
+
+# Define the constraint that each day and shift has minimum workers
+for day in days:
+    for shift_type in range(1,len(shifts) + 1):
+        # Select the appropriate shift variable based on shift_type
+        if shift_type == 1:
+            shift_var = morning_shift
+        elif shift_type == 2:
+            shift_var = night_shift
+        else:
+            shift_var = full_shift
+        print(kitchen_required(day,shift_type))
+        problem += lpSum(shift_var[(day, worker)] for worker in kitchen_workers) == kitchen_required(day,shift_type)
+        problem += lpSum(shift_var[(day, worker)] for worker in server_workers) == service_required(day,shift_type)   
+
+problem.solve(solver)
+# Solve the problem
+print("Status:", LpStatus[problem.status])
+
+print("Final values after solving:")
+for day in days:
+    for worker in workers:
+        print(f'{day},{worker} - Morning: {morning_shift[(day, worker)].varValue}, Night: {night_shift[(day, worker)].varValue}, Full: {full_shift[(day, worker)].varValue}')
+
+# Insert into Schema DB
