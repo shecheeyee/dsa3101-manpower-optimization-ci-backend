@@ -1,3 +1,2 @@
 [mysqld]
 local-infile=1
-secure-file-priv="/data/csv"
