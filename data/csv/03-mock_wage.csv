@@ -1,10 +1,7 @@
 ﻿day,role,wage
-Weekday,Server,13
-Weekday,Dishwasher,13
-Weekday,Cook,15
-Weekend,Server,14
-Weekend,Dishwasher,14
-Weekend,Cook,16
-Public Holiday,Server,15
-Public Holiday,Dishwasher,15
-Public Holiday,Cook,17
+Weekday,Service,13
+Weekday,Kitchen,15
+Weekend,Service,14
+Weekend,Kitchen,16
+Public Holiday,Service,15
+Public Holiday,Kitchen,17
