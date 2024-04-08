@@ -17,6 +17,12 @@ services:
 
 
   mysql-db:
+    container_name: mysql-db
+    image: mysql:8.0
+    environment:
+        MYSQL_ROOT_PASSWORD: root #shift to env later on
+    ports:
+      - "3307:3306"  # Map MySQL port
     volumes:
       - ./mysql_db/custom.cnf:/etc/mysql/conf.d/custom.cnf # Custom MySQL configuration file
       - ./mysql_db:/docker-entrypoint-initdb.d/:ro # runs all .sql script from docker entrypoint on container creation
