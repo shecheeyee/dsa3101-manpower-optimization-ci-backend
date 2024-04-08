@@ -27,8 +27,8 @@ day_idx_mapping = {day: idx for idx, day in enumerate(days)}
 
 # Define starting date (31st jan - 6 months)
 
-jan_31st_2024 = date(year=2024, month=1, day=31)
-start_date = jan_31st_2024
+may_10th_2024 = date(year=2024, month=5, day=10)
+start_date = may_10th_2024
 
 with open('mock_customer_demand_past.csv', 'w', newline='') as csvfile:
   writer = csv.writer(csvfile)
