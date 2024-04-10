@@ -24,7 +24,6 @@ cursor = connection.cursor()
 cursor.execute("SELECT * FROM Wage")
 results = cursor.fetchall()
 
-
 cursor.execute("SELECT * FROM Employees")
 results2 = cursor.fetchall()
 
@@ -279,29 +278,44 @@ objective = lpSum(get_wage(worker, day, shift_type) * (
 ) for day in days for worker in workers for shift_type in range(1, 4))
 
 
-for i in days:
-    for j in workers:
-        problem += lpSum([morning_shift[(i,j)], night_shift[(i,j)], full_shift[(i,j)]]) <= 1  # only one shift per day
-        problem += morning_shift[(i,j)] <= get_avail(j,i,1) #Availability Constraint
-        problem += night_shift[(i,j)] <= get_avail(j,i,2) #Availability Constraint
-        problem += full_shift[(i,j)] <= get_avail(j,i,3)
+for day in days:
+    for worker in workers:
+        problem += lpSum([morning_shift[(day,worker)], night_shift[(day,worker)], full_shift[(day,worker)]]) <= 1  # only one shift per day
+        problem += morning_shift[(day,worker)] <= get_avail(worker,day,1) #Availability Constraint
+        problem += night_shift[(day,worker)] <= get_avail(worker,day,2) #Availability Constraint
+        problem += full_shift[(day,worker)] <= get_avail(worker,day,3)
 
 
 
 
-# Define the constraints for total hours worked in a week
-for j in workers:
-    worker_role = get_role(j)
-    status = get_status(j)  # pt or ft
+# Define the constraints for total hours worked in a week   
+for worker in workers:
+    worker_role = get_role(worker)
+    status = get_status(worker)  # pt or ft
     hours_in_a_week = lpSum(
-        morning_shift[(i, j)] * shift_duration(j, 1) +
-        night_shift[(i, j)] * shift_duration(j, 2) +
-        full_shift[(i, j)] * shift_duration(j, 3) for i in days
+        morning_shift[(day, worker)] * shift_duration(worker, 1) +
+        night_shift[(day, worker)] * shift_duration(worker, 2) +
+        full_shift[(day, worker)] * shift_duration(worker, 3) for day in days
     )
     problem += hours_in_a_week <= 44 if status else hours_in_a_week <= 35  # 44 hours for full time, 35 hours for part time
 
+# Check if possible to 
+manager_dict = {}
 
-        
+for day in days:
+    check_full_shift = sum([get_avail(worker,day,3) for worker in managers])
+    if check_full_shift  == 0:
+        manager_dict[day] = 0
+    else:
+        manager_dict[day] = 1
+
+
+# One Manager per day
+for day in days:
+    if manager_dict[day] == 1:
+        problem += lpSum([full_shift[(day, worker)] for worker in managers]) == 1
+    else:
+        problem += lpSum([morning_shift[(day, worker)] + night_shift[(day, worker)] for worker in managers]) == 2
     
 # Define the constraint that each day and shift has minimum workers
 for day in days:
@@ -317,7 +331,6 @@ for day in days:
         # Add constraint: sum of assigned shifts >= 3
         problem += lpSum(shift_var[(day, worker)] for worker in kitchen_workers) == kitchen_required(day,shift_type)
         problem += lpSum(shift_var[(day, worker)] for worker in server_workers) == service_required(day,shift_type)   
-\
 
  # Suppress solver messages (optional)
 problem.solve(solver = PULP_CBC_CMD(msg=0))
@@ -325,25 +338,7 @@ problem.solve(solver = PULP_CBC_CMD(msg=0))
 print("Status:", LpStatus[problem.status])
 
 
-schedule = {}
-
-for day in days:
-    morn_lst = []
-    night_lst = []
-    full_lst = []
-    for worker in workers:
-        if morning_shift[(day, worker)].varValue == 1:
-            morn_lst.append(worker)
-        elif night_shift[(day, worker)].varValue == 1:
-            night_lst.append(worker)
-        elif full_shift[(day, worker)].varValue == 1:
-            full_lst.append(worker)
-    schedule[day] = {'morning': morn_lst, 'night': night_lst, 'full': full_lst}       
-print(schedule)
-            
 # Insert into Schema DB
-
-
 for day in days:
     for worker in kitchen_workers:
         if morning_shift[(day, worker)].varValue == 1:
@@ -364,4 +359,14 @@ for day in days:
             execute_query(query)
         elif full_shift[(day, worker)].varValue == 1:
             query = f"INSERT INTO Schedules (emp_id, week,day, shift,role) VALUES ({worker},'{global_week}','{day}','Full', 'Service')"
+            execute_query(query)
+    for worker in managers:
+        if morning_shift[(day, worker)].varValue == 1:
+            query = f"INSERT INTO Schedules (emp_id, week,day, shift,role) VALUES ({worker},'{global_week}','{day}','Morning', 'Manager')"
+            execute_query(query)
+        elif night_shift[(day, worker)].varValue == 1:
+            query = f"INSERT INTO Schedules (emp_id, week,day, shift,role) VALUES ({worker},'{global_week}','{day}','Night', 'Manager')"
+            execute_query(query)
+        elif full_shift[(day, worker)].varValue == 1:
+            query = f"INSERT INTO Schedules (emp_id, week,day, shift,role) VALUES ({worker},'{global_week}','{day}','Full', 'Manager')"
             execute_query(query)
