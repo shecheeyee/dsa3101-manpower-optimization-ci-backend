@@ -15,6 +15,7 @@ connection = pymysql.connect(
 )
 
 print("DB connected successfully!")
+# Need to change this variable.
 global_week = '2024-01-28'
 
 query = "SELECT * FROM table_name"
@@ -338,7 +339,7 @@ for day in days:
         elif full_shift[(day, worker)].varValue == 1:
             full_lst.append(worker)
     schedule[day] = {'morning': morn_lst, 'night': night_lst, 'full': full_lst}       
-schedule 
+print(schedule)
             
 # Insert into Schema DB
 
@@ -346,16 +347,21 @@ schedule
 for day in days:
     for worker in kitchen_workers:
         if morning_shift[(day, worker)].varValue == 1:
-            execute_query(("INSERT INTO Schedules (emp_id, week,day, shift,role) VALUES (%s, %s, %s, %s, %s)", (worker,global_week,day,'Morning', 'Kitchen')))
+            query = f"INSERT INTO Schedules (emp_id, week,day, shift,role) VALUES ({worker},'{global_week}','{day}','Morning', 'Kitchen')"
+            execute_query(query)
         elif night_shift[(day, worker)].varValue == 1:
-           execute_query(("INSERT INTO Schedules (emp_id, week,day, shift,role) VALUES (%s, %s, %s, %s, %s)", (worker,global_week,day,'Night', 'Kitchen')))
+            query = f"INSERT INTO Schedules (emp_id, week,day, shift,role) VALUES ({worker},'{global_week}','{day}','Night', 'Kitchen')"
+            execute_query(query)    
         elif full_shift[(day, worker)].varValue == 1:
-            execute_query(("INSERT INTO Schedules (emp_id, week,day, shift,role) VALUES (%s, %s, %s, %s, %s)", (worker,global_week,day,'Full', 'Kitchen')))
+            query = f"INSERT INTO Schedules (emp_id, week,day, shift,role) VALUES ({worker},'{global_week}','{day}','Full', 'Kitchen')"
+            execute_query(query)
     for worker in server_workers:
-        print("Checking server workers")
         if morning_shift[(day, worker)].varValue == 1:
-           execute_query(("INSERT INTO Schedules (emp_id, week,day, shift,role) VALUES (%s, %s, %s, %s, %s)", (worker,global_week,day,'Morning', 'Service')))
+            query = f"INSERT INTO Schedules (emp_id, week,day, shift,role) VALUES ({worker},'{global_week}','{day}','Morning', 'Service')"
+            execute_query(query)
         elif night_shift[(day, worker)].varValue == 1:
-          execute_query(("INSERT INTO Schedules (emp_id, week,day, shift,role) VALUES (%s, %s, %s, %s, %s)", (worker,global_week,day,'Night', 'Service')))
+            query = f"INSERT INTO Schedules (emp_id, week,day, shift,role) VALUES ({worker},'{global_week}','{day}','Night', 'Service')"
+            execute_query(query)
         elif full_shift[(day, worker)].varValue == 1:
-          execute_query(("INSERT INTO Schedules (emp_id, week,day, shift,role) VALUES (%s, %s, %s, %s, %s)", (worker,global_week,day,'Full', 'Service')))
+            query = f"INSERT INTO Schedules (emp_id, week,day, shift,role) VALUES ({worker},'{global_week}','{day}','Full', 'Service')"
+            execute_query(query)
