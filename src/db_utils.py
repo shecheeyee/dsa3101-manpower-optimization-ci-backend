@@ -3,8 +3,8 @@ import pymysql
 config = {
     'user': 'root',
     'password': 'root',
-    'host': 'mysql-db',
-    'port': 3306,
+    'host': 'localhost',
+    'port': 3307,
     'database': 'mflg'
 }
 
