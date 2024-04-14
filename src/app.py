@@ -5,6 +5,7 @@ from flask_cors import CORS
 from db_utils import execute_query
 from model.employee import  create_employee, update_employee, get_all_employees, delete_employee
 from demand_forecast import seven_days_demand_forecast
+from model.event import  create_event, update_event, get_all_events, delete_event
 import json
 import pandas as pd
 
@@ -45,6 +46,33 @@ def get_wage():
     else:
         wage_data = [{'day': row[0], 'role': row[1], 'wage': row[2]} for row in result]
         return jsonify({'wage': wage_data})
+    
+# Function to create a new event
+@app.route('/events', methods=['POST'])
+def create_new_event():
+    event_data = request.json
+    create_event(event_data)
+    return jsonify({'message': 'Event created successfully'}), 201
+
+# Function to retrieve all events
+@app.route('/events', methods=['GET'])
+def get_events():
+    events = get_all_events()
+    return jsonify({'events': events})
+
+# Function to update an event
+@app.route('/events/<int:event_id>', methods=['PUT'])
+def update_event_endpoint(event_id):
+    update_data = request.json
+    update_event(event_id, update_data)
+    return jsonify({'message': f'Event with ID {event_id} updated successfully'}), 200
+
+# Function to delete an event
+@app.route('/events/<int:event_id>', methods=['DELETE'])
+def delete_event_endpoint(event_id):
+    delete_event(event_id)
+    return jsonify({'message': f'Event with ID {event_id} deleted successfully'}), 200
+
 
 @app.route("/post_demand_forecast", methods=["POST"])
 def store_demand_forecast():

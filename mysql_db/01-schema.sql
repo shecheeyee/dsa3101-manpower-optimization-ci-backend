@@ -14,7 +14,6 @@ CREATE TABLE IF NOT EXISTS Employees (
   address VARCHAR(256)
 );
 
-
 CREATE TABLE IF NOT EXISTS Availability (
   emp_id INT REFERENCES Employees(emp_id),
   week DATE NOT NULL,
@@ -46,8 +45,10 @@ CREATE TABLE IF NOT EXISTS Events (
   event_type ENUM('Wings of Time', 'Others'),
   event_name VARCHAR(50) NOT NULL,
   num_pax INT,
-  time TIME NOT NULL,
-  duration DECIMAL(5,2) NOT NULL
+  starttime TIME NOT NULL,
+  endtime TIME NOT NULL,
+  staffReq INT,
+  remark VARCHAR(255)  
 );
 
 CREATE TABLE IF NOT EXISTS DemandForecast (
