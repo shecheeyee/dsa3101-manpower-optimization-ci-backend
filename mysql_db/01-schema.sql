@@ -2,8 +2,7 @@ USE mflg;
 
 CREATE TABLE IF NOT EXISTS Employees (
   emp_id INT PRIMARY KEY AUTO_INCREMENT,
-  first_name VARCHAR(50) NOT NULL,
-  last_name VARCHAR(50) NOT NULL,
+  name VARCHAR(50) NOT NULL,
   dob DATE NOT NULL,
   email VARCHAR(50) NOT NULL,
   gender ENUM('M', 'F') NOT NULL,
@@ -14,16 +13,17 @@ CREATE TABLE IF NOT EXISTS Employees (
   address VARCHAR(256)
 );
 
+
 CREATE TABLE IF NOT EXISTS Availability (
   emp_id INT REFERENCES Employees(emp_id),
   week DATE NOT NULL,
-  mon TINYINT NOT NULL CHECK (mon >= 0 AND mon <= 3),  -- Values: 0 (Unavailable), 1 (Shift 1), 2 (Shift 2), 3 (Both)
-  tues TINYINT NOT NULL CHECK (tues >= 0 AND tues <= 3),
-  wed TINYINT NOT NULL CHECK (wed >= 0 AND wed <= 3),
-  thur TINYINT NOT NULL CHECK (thur >= 0 AND thur <= 3),
-  fri TINYINT NOT NULL CHECK (fri >= 0 AND fri <= 3),
-  sat TINYINT NOT NULL CHECK (sat >= 0 AND sat <= 3),
-  sun TINYINT NOT NULL CHECK (sun >= 0 AND sun <= 3),
+  mon ENUM('None','Morning', 'Night', 'Full'),  -- Values: 0 (Unavailable), 1 (Shift 1), 2 (Shift 2), 3 (Both)
+  tues ENUM('None','Morning', 'Night', 'Full'),
+  wed ENUM('None','Morning', 'Night', 'Full'),
+  thur ENUM('None','Morning', 'Night', 'Full'),
+  fri ENUM('None','Morning', 'Night', 'Full'),
+  sat ENUM('None','Morning', 'Night', 'Full'),
+  sun ENUM('None','Morning', 'Night', 'Full'),
   CONSTRAINT unique_availability UNIQUE (emp_id, week)
 );
 
@@ -35,8 +35,6 @@ CREATE TABLE IF NOT EXISTS Schedules (
   shift ENUM('Morning', 'Night', 'Full') NOT NULL,
   role ENUM('Kitchen', 'Service', 'Manager') NOT NULL,
   CONSTRAINT unique_schedule UNIQUE (emp_id, week, day),
-  starttime TIME NOT NULL,
-  endtime TIME NOT NULL,
   FOREIGN KEY (emp_id) REFERENCES Employees(emp_id)
 );
 

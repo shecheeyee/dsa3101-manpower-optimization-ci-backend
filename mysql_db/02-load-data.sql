@@ -9,7 +9,7 @@ IGNORE 1 LINES;
 LOAD DATA INFILE '/var/lib/mysql-files/csv/01-mock_availability.csv'
 INTO TABLE Availability
 FIELDS TERMINATED BY ','  
-LINES TERMINATED BY '\n'  
+LINES TERMINATED BY '\r\n'
 IGNORE 1 LINES;  
 
 LOAD DATA INFILE '/var/lib/mysql-files/csv/02-mock_events.csv'
