@@ -35,6 +35,8 @@ CREATE TABLE IF NOT EXISTS Schedules (
   shift ENUM('Morning', 'Night', 'Full') NOT NULL,
   role ENUM('Kitchen', 'Service', 'Manager') NOT NULL,
   CONSTRAINT unique_schedule UNIQUE (emp_id, week, day),
+  starttime TIME NOT NULL,
+  endtime TIME NOT NULL,
   FOREIGN KEY (emp_id) REFERENCES Employees(emp_id)
 );
 
@@ -44,9 +46,8 @@ CREATE TABLE IF NOT EXISTS Events (
   date DATE NOT NULL,
   event_type ENUM('Wings of Time', 'Others'),
   event_name VARCHAR(50) NOT NULL,
+  event_period ENUM('Morning', 'Night', 'Full') NOT NULL,
   num_pax INT,
-  starttime TIME NOT NULL,
-  endtime TIME NOT NULL,
   staffReq INT,
   remark VARCHAR(255)  
 );
