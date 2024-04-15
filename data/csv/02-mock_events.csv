@@ -19,3 +19,4 @@ event_id,date,event_type,event_name,event_period,staffReq,num_pax,remark
 18,2024-01-27,Others,Company,Night,3,79,"Event ran smoothly"
 19,2024-01-30,Wings of Time,Tour,Night,3,63,"Insightful guided tour"
 20,2024-01-30,Others,Random,Night,1,37,"Relaxing ambiance"
+21, 2024-04-19,Wings of Time,Tour,Full,2,80,"Buffet across the day"

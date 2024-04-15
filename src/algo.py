@@ -4,6 +4,8 @@ import numpy as np
 from pulp import *
 from db_utils import execute_query
 from demand_forecast import seven_days_demand_forecast
+from datetime import datetime, timedelta
+
 
 # Establish a secure connection to the MySQL database using pymysql
 connection = pymysql.connect(
@@ -14,21 +16,30 @@ connection = pymysql.connect(
     database='mflg'
 )
 
+
 print("DB connected successfully!")
-# Need to change this variable.
-global_week = '2024-01-28'
 
 query = "SELECT * FROM table_name"
 cursor = connection.cursor()
 
-cursor.execute("SELECT * FROM Wage")
-results = cursor.fetchall()
+query = "SELECT MAX(week) AS latest_date FROM Availability"
+global_week = execute_query(query)
+date_obj = global_week[0][0]
+global_week = date_obj.strftime('%Y-%m-%d')
+print(global_week)
 
-cursor.execute("SELECT * FROM Employees")
-results2 = cursor.fetchall()
+query = "SELECT * FROM Wage"
+results = execute_query(query)
 
-cursor.execute("SELECT * FROM Availability WHERE week = '%s' " % (global_week) )
-results3 = cursor.fetchall()
+query = "SELECT * FROM Employees"
+results2 = execute_query(query)
+
+query = "SELECT * FROM Availability WHERE week = '%s' " % (global_week) 
+results3 = execute_query(query)
+
+query = "SELECT * FROM Events"
+results4 = execute_query(query)
+
 
 data = seven_days_demand_forecast().iloc[:, -3:]
 pivot_df = data.pivot_table(index='Time', columns='Day', values='ExpectedCustomers', fill_value=0)
@@ -36,9 +47,12 @@ days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sun
 pivot_df = pivot_df[days]
 pivot_df.index.name = None
 pivot_df.columns.name = None
-print(pivot_df)
 
 
+
+
+df_events = pd.DataFrame(results4, columns = ['event_id','date','event_type','event_name','event_period','staffReq','num_pax','remark'])
+df_wings_of_time = df_events[df_events['event_type'] == 'Wings of Time']
 df_wage = pd.DataFrame(results, columns = ['Day', 'Role', 'Wage'])
 df_avail = pd.DataFrame(results3, columns =  ['id','week','Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'])
 
@@ -65,18 +79,46 @@ managers = [worker for worker in workers if get_role(worker) == 'Manager']
 # Transpose the DataFrame to have times as rows and days as columns
 hrs = ['1000', '1100', '1200', '1300', '1400', '1500', '1600', '1700', '1800', '1900', '2000', '2100']
 pivot_df.index = hrs
-print(pivot_df)
+
+
+def get_dates_and_day():
+    # Get today's date
+    today = datetime.now()
+
+    # Calculate the date of the previous Sunday
+    sunday = today - timedelta(days=today.weekday() + 1)
+
+    # Calculate the dates for the current week starting from Sunday
+    dates_of_week = [sunday + timedelta(days=i) for i in range(7)]
+
+    return dates_of_week
+
+dates_of_week = get_dates_and_day()
+dates_of_week = [date_obj.date() for date_obj in dates_of_week]
+dates_of_week = [d.strftime("%Y-%m-%d") for d in dates_of_week]
+current_week = pd.DataFrame({"date" : dates_of_week, "day" : days})
+df_wings_of_time['date'] = pd.to_datetime(df_wings_of_time['date']).dt.strftime('%Y-%m-%d')
+joined_df = current_week.merge(df_wings_of_time, on='date', how='inner') # only events that are in the current week
+print(joined_df)
+selected_columns = ['day', 'event_period', 'staffReq']
+extracted_df = joined_df[selected_columns]
+
 
 
 # Array representing shifting hours
 timings = np.array([[1,0,1],
                 [1,1,1],
-                [0,1,1]])
+                [0,1,1]])   
 # number of shifts
 num_shifts = timings.shape[1]
 
 # number of time windows
 num_time = timings.shape[0]
+
+
+# Event variable
+event_happening = False
+
 
 # Define your functions with assumed business rules
 def kitchen_required_func(x):
@@ -105,11 +147,23 @@ time_windows_kitchen = {
     'Night': df_kitchen_mapped['1800':'2200'].max()
 }
 
+
 time_windows_service = {
     'Morning': df_service_mapped['1000':'1200'].max(),
     'Afternoon': df_service_mapped['1200':'1800'].max(),
     'Night': df_service_mapped['1800':'2200'].max()
 }
+
+for index, row in extracted_df.iterrows():
+    period = row['event_period']
+    event_day = row['day']
+    add_staff = row['staffReq']
+    if period == 'Full':
+        time_windows_service['Morning'][event_day] += add_staff
+        time_windows_service['Afternoon'][event_day] += add_staff
+        time_windows_service['Night'][event_day] += add_staff
+    else:
+        time_windows_service[period][event_day] += add_staff
 
 df_time_windows_kitchen = pd.DataFrame(time_windows_kitchen)
 df_time_windows_service = pd.DataFrame(time_windows_service)
@@ -128,6 +182,9 @@ for day in days:
 
     for t in range(num_time):
         shift_problem += lpSum([timings[t, j] * workers_per_shift[j] for j in range(num_shifts)]) >= df_time_windows_kitchen.iloc[days.index(day),t]
+
+    for i in range(num_shifts):
+        shift_problem += workers_per_shift[i] <= df_avail[df_avail['id'].isin(kitchen_workers)][day].to_list().count(i+1)
 
     shift_problem.solve(solver = PULP_CBC_CMD(msg=0))
 
@@ -159,10 +216,9 @@ for day in days:
         temp_lst.append(workers_per_shift[shift].value())
     service_staff_dict[day] = temp_lst
 
+print(service_staff_dict)
 
 # Scheduling Algorithm
-# Enter shifts of each day
-# Enter shifts of each day
 shifts = ['morning', 'night', 'full']  
 days_shifts = {day: shifts for day in days}  # dict with day as key and list of its shifts as value
 service_shift_duration = {1: 8, 
@@ -281,10 +337,16 @@ objective = lpSum(get_wage(worker, day, shift_type) * (
 for day in days:
     for worker in workers:
         problem += lpSum([morning_shift[(day,worker)], night_shift[(day,worker)], full_shift[(day,worker)]]) <= 1  # only one shift per day
-        problem += morning_shift[(day,worker)] <= get_avail(worker,day,1) #Availability Constraint
-        problem += night_shift[(day,worker)] <= get_avail(worker,day,2) #Availability Constraint
+        problem += morning_shift[(day,worker)] <= get_avail(worker,day,1) 
+        problem += night_shift[(day,worker)] <= get_avail(worker,day,2) 
         problem += full_shift[(day,worker)] <= get_avail(worker,day,3)
 
+
+default_hours_ft = 44
+default_hours_pt = 35
+
+# Get inputs from the frontend and change the numbers below
+###
 
 
 
