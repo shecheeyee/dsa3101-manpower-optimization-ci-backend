@@ -3,13 +3,14 @@ from db_utils import execute_query
 
 def create_schedule(data):
     mapped_fields = {
-        'empId': 'emp_id',
-        'week': 'week',
-        'day': 'day',
+        'id': 'scheduleId',
+        'employeeId': 'emp_id',
+        'start': 'starttime',
+        'end': 'endtime',
         'shift': 'shift',
+        'day': 'day',
         'role': 'role',
-        'startTime': 'starttime',
-        'endTime': 'endtime'
+        'week': 'week'
     }
 
     db_fields = []
@@ -26,6 +27,7 @@ def create_schedule(data):
     query = f"INSERT INTO Schedules ({field_names}) VALUES ({field_values})"
     execute_query(query)
 
+
 def get_all_schedules():
     query = "SELECT * FROM Schedules"
     schedules_from_db = execute_query(query)
@@ -33,14 +35,14 @@ def get_all_schedules():
     schedules_for_frontend = []
     for schedule in schedules_from_db:
         mapped_schedule = {
-            'scheduleId': schedule['scheduleId'],
-            'empId': schedule['emp_id'],
-            'week': schedule['week'].strftime('%Y-%m-%d'),
-            'day': schedule['day'],
+            'id': schedule['scheduleId'],
+            'employeeId': schedule['emp_id'],
+            'start': schedule['starttime'].strftime('%H:%M:%S'),
+            'end': schedule['endtime'].strftime('%H:%M:%S'),
             'shift': schedule['shift'],
+            'day': schedule['day'],
             'role': schedule['role'],
-            'startTime': schedule['starttime'].strftime('%H:%M:%S'),
-            'endTime': schedule['endtime'].strftime('%H:%M:%S')
+            'week': schedule['week'].strftime('%Y-%m-%d')
         }
         schedules_for_frontend.append(mapped_schedule)
 
@@ -49,13 +51,13 @@ def get_all_schedules():
 
 def update_schedule(schedule_id, update_data):
     mapped_fields = {
-        'empId': 'emp_id',
-        'week': 'week',
-        'day': 'day',
+        'employeeId': 'emp_id',
+        'start': 'starttime',
+        'end': 'endtime',
         'shift': 'shift',
+        'day': 'day',
         'role': 'role',
-        'startTime': 'starttime',
-        'endTime': 'endtime'
+        'week': 'week'
     }
 
     update_fields = []
@@ -74,4 +76,3 @@ def update_schedule(schedule_id, update_data):
 def delete_schedule(schedule_id):
     query = f"DELETE FROM Schedules WHERE scheduleId = {schedule_id}"
     execute_query(query)
-
