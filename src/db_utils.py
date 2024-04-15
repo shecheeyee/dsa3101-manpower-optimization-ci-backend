@@ -14,7 +14,14 @@ def execute_query(query):
         cursor = connection.cursor()
         cursor.execute(query)
         if query.strip().lower().startswith('select'):
-            result = cursor.fetchall()
+            # Fetch column names from cursor description
+            column_names = [desc[0] for desc in cursor.description]
+            # Fetch all rows
+            rows = cursor.fetchall()
+            # Convert rows to dictionaries
+            result = []
+            for row in rows:
+                result.append(dict(zip(column_names, row)))
             return result
         else:
             connection.commit()
