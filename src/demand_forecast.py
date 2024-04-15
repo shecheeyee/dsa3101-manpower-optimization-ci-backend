@@ -60,17 +60,17 @@ def list_of_next_seven_days():
     return seven_day_prediction
 
 # Fetch PastDemand data
-def get_past_demand():
-    query = "SELECT * FROM PastDemand"
-    result = execute_query(query)
-    past_demand_data = [{'Date': str(row[0]), 'Day': row[1], 'Time': str(row[2]), "Customers": row[3]} for row in result]
-    df = pd.DataFrame(past_demand_data)
-    return df
+# def get_past_demand():
+#     query = "SELECT * FROM PastDemand"
+#     result = execute_query(query)
+#     past_demand_data = [{'Date': str(row[0]), 'Day': row[1], 'Time': str(row[2]), "Customers": row[3]} for row in result]
+#     df = pd.DataFrame(past_demand_data)
+#     return df
 
 # # For testing locally
-# def get_past_demand():
-#     df = pd.read_csv("../data/csv/04-mock_customer_demand_past.csv", index_col=False)
-#     return df
+def get_past_demand():
+    df = pd.read_csv("../data/csv/04-mock_customer_demand_past.csv", index_col=False)
+    return df
 
 # Fit PastDemand data into model and predict next week's demand
 # # I'll be using Darts library for time series forecasting: Documentation: https://unit8co.github.io/darts/

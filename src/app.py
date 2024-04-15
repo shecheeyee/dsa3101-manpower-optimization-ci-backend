@@ -96,24 +96,6 @@ def delete_schedule_endpoint(schedule_id):
     delete_schedule(schedule_id)
     return jsonify({'message': f'Schedule with ID {schedule_id} deleted successfully'}), 200
 
-
-@app.route("/post_demand_forecast", methods=["POST"])
-def store_demand_forecast():
-    forecast_demand = seven_days_demand_forecast() # forecast demand for today and next 6 days
-    for index, row in forecast_demand.iterrows():
-        field_names = f"Date, Day, Time, expectedCustomers"
-        field_values = f"DATE '{row['Date']}', '{row['Day']}', TIME '{row['Time']}', '{row['ExpectedCustomers']}'"
-        query = f"INSERT INTO DemandForecast ({field_names}) VALUES ({field_values})"
-        execute_query(query)
-    return jsonify({"message": "Data stored successfully"})
-
-@app.route("/get_demand_forecast", methods=["GET"])
-def get_demand_forecast():
-    query = "SELECT * FROM DemandForecast"
-    result = execute_query(query)
-    demand_forecast_data = [{'Date': row[0], 'Day': row[1], 'Time': str(row[2]), "actualCustomers": row[3]} for row in result]
-    return jsonify(demand_forecast_data)
-
 @app.route("/post_past_demand", methods=["POST"])
 def post_past_demand():
     csv_file = request.files['file']
@@ -129,8 +111,38 @@ def post_past_demand():
 def get_past_demand():
     query = "SELECT * FROM PastDemand"
     result = execute_query(query)
-    past_demand_data = [{'Date': row[0], 'Day': row[1], 'Time': str(row[2]), "actualCustomers": row[3]} for row in result]
-    return jsonify(past_demand_data)
+    if 'error' in result:
+        return jsonify(result), 500
+    else:
+        past_demand_data = [{'Date': row[0], 'Day': row[1], 'Time': str(row[2]), "actualCustomers": row[3]} for row in result]
+        return jsonify(past_demand_data)
+
+@app.route("/post_demand_forecast", methods=["POST"])
+def store_demand_forecast():
+    # Delete all rows from DemandForecast table
+    query = "DELETE FROM DemandForecast"
+    execute_query(query)
+
+    # Forecast demand for today and next 6 days
+    forecast_demand = seven_days_demand_forecast()
+
+    # Store forecasted demand in the database
+    for index, row in forecast_demand.iterrows():
+        field_names = f"Date, Day, Time, expectedCustomers"
+        field_values = f"DATE '{row['Date']}', '{row['Day']}', TIME '{row['Time']}', '{row['ExpectedCustomers']}'"
+        query = f"INSERT INTO DemandForecast ({field_names}) VALUES ({field_values})"
+        execute_query(query)
+    return jsonify({"message": "Data stored successfully"})
+
+@app.route("/get_demand_forecast", methods=["GET"])
+def get_demand_forecast():
+    query = "SELECT * FROM DemandForecast"
+    result = execute_query(query)
+    if 'error' in result:
+        return jsonify(result), 500
+    else:
+        demand_forecast_data = [{'Date': row[0], 'Day': row[1], 'Time': str(row[2]), "actualCustomers": row[3]} for row in result]
+        return jsonify(demand_forecast_data)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
