@@ -35,6 +35,8 @@ CREATE TABLE IF NOT EXISTS Schedules (
   shift ENUM('Morning', 'Night', 'Full') NOT NULL,
   role ENUM('Kitchen', 'Service', 'Manager') NOT NULL,
   CONSTRAINT unique_schedule UNIQUE (emp_id, week, day),
+  starttime TIME NOT NULL,
+  endtime TIME NOT NULL,
   FOREIGN KEY (emp_id) REFERENCES Employees(emp_id)
 );
 
