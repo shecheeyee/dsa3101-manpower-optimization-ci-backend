@@ -1,6 +1,7 @@
 from datetime import date
 import pandas as pd
 from holidays import SG, Singapore
+from db_utils import execute_query
 
 def sg_holidays():
   """
@@ -65,3 +66,68 @@ def year_holidays(year):
   df= pd.DataFrame(data)
   return df
 
+
+
+def get_global_week():
+  """
+  Retrieves the most recent week from the 'Availability' table.
+
+  Returns:
+      str: The latest week as a string formatted as 'YYYY-MM-DD'.
+  """
+  query = "SELECT MAX(week) AS latest_date FROM Availability"
+  global_week = execute_query(query)
+  date_obj = global_week[0]['latest_date']
+  global_week = date_obj.strftime('%Y-%m-%d')
+  return global_week
+
+def wage_query():
+  """
+  Retrieves all data from the 'Wage' table.
+
+  Returns:
+      pandas.DataFrame: A DataFrame containing wage data. (Also prints the DataFrame)
+  """
+  query = "SELECT * FROM Wage"
+  wage_query = execute_query(query)
+  df_wage = pd.DataFrame(wage_query)
+  return df_wage
+
+def get_employee_data():
+  """
+  Retrieves all data from the 'Employees' table and renames the 'emp_id' column to 'id'.
+
+  Returns:
+      pandas.DataFrame: A DataFrame containing employee data 
+  """
+  query = "SELECT * FROM Employees"
+  employee_query = execute_query(query)
+  df = pd.DataFrame(employee_query)
+  return df
+
+def get_avail_data(global_week):
+  """
+  Retrieves availability data for the specified 'global_week' from the 'Availability' table.
+
+  Args:
+      global_week (str): The week as a string formatted as 'YYYY-MM-DD'.
+
+  Returns:
+      pandas.DataFrame: A DataFrame containing availability data for the given week
+  """
+  query = "SELECT * FROM Availability WHERE week = '%s' " % (global_week) 
+  avail_query = execute_query(query)
+  df_avail = pd.DataFrame(avail_query)
+  return df_avail
+
+def get_event_data():
+  """
+  Retrieves all data from the 'Events' table.
+
+  Returns:
+      pandas.DataFrame: A DataFrame containing event data. (Also prints the DataFrame)
+  """
+  query = "SELECT * FROM Events"
+  event_query = execute_query(query)
+  df_events = pd.DataFrame(event_query)
+  return df_events
