@@ -9,3 +9,4 @@ PyMySQL[rsa]
 python-dotenv==1.0.1
 requests==2.31.0
 darts==0.28.0
+pytest==8.1.1
