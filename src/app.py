@@ -15,21 +15,21 @@ CORS(app)
 @app.route('/employees', methods=['POST'])
 def create_new_employee():
     employee_data = request.json
-    create_employee(employee_data)
-    return jsonify({'message': 'Employee created successfully'}), 201
+    a = create_employee(employee_data)
+    return jsonify({'message': 'Employee created successfully' + str(a)}), 201
 
 # Function to retrieve all employees
 @app.route('/employees', methods=['GET'])
 def get_employees():
     employees = get_all_employees()
-    return jsonify({'employees': employees})
+    return employees
 
 # Function to update an employee
 @app.route('/employees/<int:emp_id>', methods=['PUT'])
 def update_e(emp_id):
     update_data = request.json
-    update_employee(emp_id, update_data)
-    return jsonify({'message': f'Employee with ID {emp_id} updated successfully'}), 200
+    a = update_employee(emp_id, update_data)
+    return jsonify({'message': f'Employee with ID {emp_id} updated successfully'+ str(a)}), 200
 
 # Function to delete an employee
 @app.route('/employees/<int:emp_id>', methods=['DELETE'])
