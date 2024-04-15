@@ -25,7 +25,7 @@ def create_schedule(data):
     field_values = ', '.join(db_values)
 
     query = f"INSERT INTO Schedules ({field_names}) VALUES ({field_values})"
-    execute_query(query)
+    return execute_query(query)
 
 
 def get_all_schedules():
@@ -37,12 +37,12 @@ def get_all_schedules():
         mapped_schedule = {
             'id': schedule['scheduleId'],
             'employeeId': schedule['emp_id'],
-            'start': schedule['starttime'].strftime('%H:%M:%S'),
-            'end': schedule['endtime'].strftime('%H:%M:%S'),
+            'start': str(schedule['starttime']),
+            'end': str(schedule['endtime']),
             'shift': schedule['shift'],
             'day': schedule['day'],
             'role': schedule['role'],
-            'week': schedule['week'].strftime('%Y-%m-%d')
+            'week': schedule['week']
         }
         schedules_for_frontend.append(mapped_schedule)
 
@@ -70,9 +70,9 @@ def update_schedule(schedule_id, update_data):
 
     set_clause = ", ".join(update_fields)
     query = f"UPDATE Schedules SET {set_clause} WHERE scheduleId = {schedule_id}"
-    execute_query(query)
+    return execute_query(query)
 
 
 def delete_schedule(schedule_id):
     query = f"DELETE FROM Schedules WHERE scheduleId = {schedule_id}"
-    execute_query(query)
+    return execute_query(query)

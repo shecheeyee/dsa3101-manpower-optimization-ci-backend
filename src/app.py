@@ -77,8 +77,8 @@ def delete_event_endpoint(event_id):
 @app.route('/schedule', methods=['POST'])
 def create_new_schedule():
     schedule_data = request.json
-    create_schedule(schedule_data)
-    return jsonify({'message': 'Schedule created successfully'}), 201
+    a = create_schedule(schedule_data)
+    return jsonify({'message': 'Schedule created successfully' + str(a)}), 201
 
 @app.route('/schedule', methods=['GET'])
 def get_schedules():
