@@ -1,41 +1,41 @@
-emp_id,first_name,last_name,dob,email,gender,primary_role,secondary_role,wage,status,address
-1,Charin,Sneller,1994-04-11,csneller0@ox.ac.uk,M,Manager,Manager,4818.28,Full time,3 Prentice Point
-2,Karna,Topping,1979-05-12,ktopping1@si.edu,M,Kitchen,Kitchen,3910.96,Full time,9 Summerview Park
-3,Lindon,Kyncl,1977-11-11,lkyncl2@mysql.com,M,Service,Service,0,Part time,9063 American Street
-4,Ruben,Blasoni,1974-01-19,rblasoni3@salon.com,F,Kitchen,Kitchen,2278.67,Full time,212 Gateway Pass
-5,Barret,OFielly,1963-07-10,bofielly4@artisteer.com,M,Kitchen,Kitchen,0,Part time,7482 Namekagon Point
-6,Devan,Maddinon,1959-11-19,dmaddinon5@networksolutions.com,F,Manager,Manager,4553.48,Full time,16780 Sachtjen Hill
-7,Aurea,Lademann,1953-10-14,alademann6@woothemes.com,M,Kitchen,Service,0,Part time,0 Spaight Point
-8,Isaiah,Hair,1955-05-29,ihair7@eventbrite.com,M,Service,Service,0,Part time,40 Cascade Road
-9,Sile,Coppins,1967-04-16,scoppins8@newyorker.com,F,Service,Kitchen,0,Part time,1 Nancy Park
-10,Casey,Feige,1995-09-13,cfeige9@instagram.com,F,Manager,Manager,4918.28,Full time,31 Fuller Parkway
-11,Marybeth,Molohan,1986-04-27,mmolohana@kickstarter.com,F,Kitchen,Kitchen,0,Part time,0027 Logan Junction
-12,Maximilian,Perford,1951-03-04,mperfordb@nationalgeographic.com,F,Kitchen,Kitchen,3806.25,Full time,4 Heath Street
-13,Nanette,Braidon,1987-11-08,nbraidonc@rakuten.co.jp,M,Kitchen,Service,0,Part time,871 Bluejay Crossing
-14,Alexandra,Dix,1986-06-02,adixd@goodreads.com,M,Kitchen,Kitchen,4167.84,Full time,66635 2nd Pass
-15,Abram,Lamputt,1986-03-04,alamputte@barnesandnoble.com,F,Service,Kitchen,0,Part time,60454 Sloan Place
-16,Ailene,Winsper,1965-01-19,awinsperf@tripadvisor.com,F,Service,Kitchen,0,Part time,357 Shoshone Court
-17,Ingamar,Warstall,1988-02-18,iwarstallg@newsvine.com,M,Kitchen,Kitchen,0,Part time,89528 Gateway Center
-18,Oralee,Scruby,1951-05-25,oscrubyh@youtu.be,M,Service,Kitchen,3652.23,Full time,25 Center Road
-19,Malory,Cruft,1988-04-21,mcrufti@nbcnews.com,F,Kitchen,Service,3517.18,Full time,5 Eggendart Circle
-20,Prentiss,Guppy,1950-10-11,pguppyj@wired.com,F,Service,Kitchen,0,Part time,109 Cambridge Junction
-21,Lev,Glasscott,1989-03-05,lglasscottk@economist.com,M,Service,Kitchen,0,Part time,5 Swallow Road
-22,Reggie,Showler,1982-01-17,rshowlerl@mlb.com,F,Kitchen,Kitchen,0,Part time,039 Caliangt Place
-23,Tamqrah,Bogue,1981-11-21,tboguem@netscape.com,M,Kitchen,Service,0,Part time,3 Anniversary Point
-24,Gabi,Jirzik,1953-10-08,gjirzikn@unc.edu,M,Kitchen,Service,0,Part time,48126 Rutledge Park
-25,Towny,Seage,1969-05-16,tseageo@umn.edu,M,Manager,Manager,4797.83,Full time,73 American Street
-26,Janeen,Dinsey,1950-06-12,jdinseyp@ycombinator.com,M,Kitchen,Kitchen,2126.78,Full time,3 Cardinal Court
-27,Elston,Hardway,1954-05-22,ehardwayq@mail.ru,F,Kitchen,Service,3790.72,Full time,8873 Toban Park
-28,Uriah,Stanes,1986-05-20,ustanesr@illinois.edu,M,Manager,Manager,4801.86,Full time,04 Luster Terrace
-29,Katya,OBrogan,1992-03-19,kobrogans@seattletimes.com,M,Kitchen,Kitchen,0,Part time,55 Holy Cross Drive
-30,Cicily,Polsin,1979-04-10,cpolsint@acquirethisname.com,M,Kitchen,Service,3097.49,Full time,0 Monument Junction
-31,Prentiss,Guppy,1950-10-11,pguppyj@wired.com,F,Service,Service,0,Part time,109 Cambridge Junction
-32,Harman,Morewood,1978-03-12,hmorewoodk@vinaora.com,M,Service,Service,1,Full time,92 3rd Way
-33,Matilde,Burling,1985-07-15,murlingl@istockphoto.com,F,Service,Service,0,Part time,4 Eggendart Trail
-34,Morgan,Sparrow,1963-01-08,msparrowm@mapquest.com,F,Service,Service,1,Full time,5899 Dorton Plaza
-35,Graehme,Madill,1974-11-27,gmadilln@eepurl.com,M,Service,Service,1,Full time,5 Russell Pass
-36,Morley,De Launde,1979-05-31,mdelaundeo@google.com,F,Service,Service,0,Part time,58 Wayridge Alley
-37,Marice,Sturridge,1998-08-17,msturridgep@examiner.com,F,Service,Service,1,Full time,22343 Cascade Hill
-38,Glynda,Rushmer,1967-02-05,grushmerq@sciencedirect.com,F,Service,Service,1,Full time,51 Roth Lane
-39,Arch,Heintz,1980-06-23,aheintzr@princeton.edu,M,Service,Service,1,Full time,9 Beilfuss Plaza
-40,Daisie,Bage,1977-10-14,dbages@dedecms.com,F,Service,Service,0,Part time,51 Heffernan Park
+emp_id,name,dob,email,gender,primary_role,secondary_role,wage,status,address
+1,Charin Sneller,1994-04-11,csneller0@ox.ac.uk,M,Manager,Manager,4818.28,Full time,3 Prentice Point
+2,Karna Topping,1979-05-12,ktopping1@si.edu,M,Kitchen,Kitchen,3910.96,Full time,9 Summerview Park
+3,Lindon Kyncl,1977-11-11,lkyncl2@mysql.com,M,Service,Service,0,Part time,9063 American Street
+4,Ruben Blasoni,1974-01-19,rblasoni3@salon.com,F,Kitchen,Kitchen,2278.67,Full time,212 Gateway Pass
+5,Barret OFielly,1963-07-10,bofielly4@artisteer.com,M,Kitchen,Kitchen,0,Part time,7482 Namekagon Point
+6,Devan Maddinon,1959-11-19,dmaddinon5@networksolutions.com,F,Manager,Manager,4553.48,Full time,16780 Sachtjen Hill
+7,Aurea Lademann,1953-10-14,alademann6@woothemes.com,M,Kitchen,Service,0,Part time,0 Spaight Point
+8,Isaiah Hair,1955-05-29,ihair7@eventbrite.com,M,Service,Service,0,Part time,40 Cascade Road
+9,Sile Coppins,1967-04-16,scoppins8@newyorker.com,F,Service,Kitchen,0,Part time,1 Nancy Park
+10,Casey Feige,1995-09-13,cfeige9@instagram.com,F,Manager,Manager,4918.28,Full time,31 Fuller Parkway
+11,Marybeth Molohan,1986-04-27,mmolohana@kickstarter.com,F,Kitchen,Kitchen,0,Part time,0027 Logan Junction
+12,Maximilian Perford,1951-03-04,mperfordb@nationalgeographic.com,F,Kitchen,Kitchen,3806.25,Full time,4 Heath Street
+13,Nanette Braidon,1987-11-08,nbraidonc@rakuten.co.jp,M,Kitchen,Service,0,Part time,871 Bluejay Crossing
+14,Alexandra Dix,1986-06-02,adixd@goodreads.com,M,Kitchen,Kitchen,4167.84,Full time,66635 2nd Pass
+15,Abram Lamputt,1986-03-04,alamputte@barnesandnoble.com,F,Service,Kitchen,0,Part time,60454 Sloan Place
+16,Ailene Winsper,1965-01-19,awinsperf@tripadvisor.com,F,Service,Kitchen,0,Part time,357 Shoshone Court
+17,Ingamar Warstall,1988-02-18,iwarstallg@newsvine.com,M,Kitchen,Kitchen,0,Part time,89528 Gateway Center
+18,Oralee Scruby,1951-05-25,oscrubyh@youtu.be,M,Service,Kitchen,3652.23,Full time,25 Center Road
+19,Malory Cruft,1988-04-21,mcrufti@nbcnews.com,F,Kitchen,Service,3517.18,Full time,5 Eggendart Circle
+20,Prentiss Guppy,1950-10-11,pguppyj@wired.com,F,Service,Kitchen,0,Part time,109 Cambridge Junction
+21,Lev Glasscott,1989-03-05,lglasscottk@economist.com,M,Service,Kitchen,0,Part time,5 Swallow Road
+22,Reggie Showler,1982-01-17,rshowlerl@mlb.com,F,Kitchen,Kitchen,0,Part time,039 Caliangt Place
+23,Tamqrah Bogue,1981-11-21,tboguem@netscape.com,M,Kitchen,Service,0,Part time,3 Anniversary Point
+24,Gabi Jirzik,1953-10-08,gjirzikn@unc.edu,M,Kitchen,Service,0,Part time,48126 Rutledge Park
+25,Towny Seage,1969-05-16,tseageo@umn.edu,M,Manager,Manager,4797.83,Full time,73 American Street
+26,Janeen Dinsey,1950-06-12,jdinseyp@ycombinator.com,M,Kitchen,Kitchen,2126.78,Full time,3 Cardinal Court
+27,Elston Hardway,1954-05-22,ehardwayq@mail.ru,F,Kitchen,Service,3790.72,Full time,8873 Toban Park
+28,Uriah Stanes,1986-05-20,ustanesr@illinois.edu,M,Manager,Manager,4801.86,Full time,04 Luster Terrace
+29,Katya OBrogan,1992-03-19,kobrogans@seattletimes.com,M,Kitchen,Kitchen,0,Part time,55 Holy Cross Drive
+30,Cicily Polsin,1979-04-10,cpolsint@acquirethisname.com,M,Kitchen,Service,3097.49,Full time,0 Monument Junction
+31,Prentiss Guppy,1950-10-11,pguppyj@wired.com,F,Service,Service,0,Part time,109 Cambridge Junction
+32,Harman Morewood,1978-03-12,hmorewoodk@vinaora.com,M,Service,Service,1,Full time,92 3rd Way
+33,Matilde Burling,1985-07-15,murlingl@istockphoto.com,F,Service,Service,0,Part time,4 Eggendart Trail
+34,Morgan Sparrow,1963-01-08,msparrowm@mapquest.com,F,Service,Service,1,Full time,5899 Dorton Plaza
+35,Graehme Madill,1974-11-27,gmadilln@eepurl.com,M,Service,Service,1,Full time,5 Russell Pass
+36,Morley De Launde,1979-05-31,mdelaundeo@google.com,F,Service,Service,0,Part time,58 Wayridge Alley
+37,Marice Sturridge,1998-08-17,msturridgep@examiner.com,F,Service,Service,1,Full time,22343 Cascade Hill
+38,Glynda Rushmer,1967-02-05,grushmerq@sciencedirect.com,F,Service,Service,1,Full time,51 Roth Lane
+39,Arch Heintz,1980-06-23,aheintzr@princeton.edu,M,Service,Service,1,Full time,9 Beilfuss Plaza
+40,Daisie Bage,1977-10-14,dbages@dedecms.com,F,Service,Service,0,Part time,51 Heffernan Park

@@ -2,52 +2,40 @@
 from db_utils import execute_query
 
 # Function to create a new employee
-# Import the execute_query function from db_utils.py
-from db_utils import execute_query
-
-# Function to create a new employee with schedules
 def create_employee(data):
-    # Extract employee information
-    emp_data = {
-        'first_name': data['full_name'].split()[0],  # Split full_name into first_name and last_name
-        'last_name': data['full_name'].split()[1] if ' ' in data['full_name'] else '',  # Handle cases where full_name has no space
-        'wage': data['wage'],
-        'primary_role': data['role'],
-        'secondary_role': data['secondary_role']
-    }
+    # Extract employee data from the input dictionary
+    name = data['name']
+    primary_role = data['role']
+    secondary_role = data['secondaryRole']
+    wage = data['wage']
+    status = data['employmentType']  # Employment status (e.g., full-time, part-time)
     
-    # Create the INSERT query for Employees table
-    emp_fields = ', '.join(emp_data.keys())
-    emp_values = ', '.join(f"'{value}'" if isinstance(value, str) else str(value) for value in emp_data.values())
-    emp_query = f"INSERT INTO Employees ({emp_fields}) VALUES ({emp_values})"
+    query = "SELECT MAX(emp_id) FROM Employees"
+    emp_id = execute_query(query)[0]['MAX(emp_id)']+1
+    print(emp_id)
+    # Prepare SQL query to insert into Employees table
+    insert_employee_query = f"""
+        INSERT INTO Employees (emp_id, first_name, last_name, dob, email, gender, primary_role, secondary_role, wage, status)
+        VALUES ('{emp_id}', '{name}', '2000-12-12', 'abc@gmail.com', 'M', '{primary_role}', '{secondary_role}', {wage}, '{status}')
+    """
     
-    # Execute the query to insert employee data
-    result = execute_query(emp_query)
-    emp_id = result.lastrowid  # Get the auto-generated emp_id
-    
-    # Extract and insert schedules for each weekday
-    for day in ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']:
-        if data[day] is not None:
-            schedule_data = {
-                'emp_id': emp_id,
-                'week': data[day]['week'],
-                'day': day.capitalize(),
-                'shift': data[day]['shift'],
-                'role': data[day]['role']
-            }
-            # Create the INSERT query for Schedules table
-            schedule_fields = ', '.join(schedule_data.keys())
-            schedule_values = ', '.join(f"'{value}'" if isinstance(value, str) else str(value) for value in schedule_data.values())
-            schedule_query = f"INSERT INTO Schedules ({schedule_fields}) VALUES ({schedule_values})"
-            
-            # Execute the query to insert schedule data
-            execute_query(schedule_query)
+    # Execute the insert query to add the employee to Employees table
+    a = execute_query(insert_employee_query)
 
+    # Prepare SQL query to insert into Availability table
+    insert_availability_query = f"""
+        INSERT INTO Availability (emp_id, week, mon, tues, wed, thur, fri, sat, sun)
+        VALUES  ({emp_id}, '2023-12-31',{data['mon']}, {data['tues']}, {data['wed']}, {data['thurs']}, {data['fri']}, {data['sat']}, {data['sun']})
+    """
+    execute_query(insert_availability_query)
+
+    # Return the emp_id of the newly created employee
+    return str(a) + str(secondary_role)
 
 # Function to retrieve all employees
 def get_all_employees():
     query = """
-        SELECT e.emp_id, e.first_name, e.last_name,
+        SELECT e.emp_id, e.name,
                e.primary_role, e.secondary_role, e.wage, e.status, e.address,
                a.week, a.mon, a.tues, a.wed, a.thur, a.fri, a.sat, a.sun
         FROM Employees e
@@ -68,14 +56,16 @@ def get_all_employees():
         # Build the employee dictionary
         employee = {
             'id': emp_id,
-            'name': f"{row['first_name']} {row['last_name']}",
+            'name': f"{row['name']}",
             'role': row['primary_role'],
+            'secondaryRole' : row['secondary_role'],
+            'employmentType' : row['status'],
             'wage': row['wage'],
             'type': row['status'],
             'mon': row['mon'],
             'tues': row['tues'],
             'wed': row['wed'],
-            'thur': row['thur'],
+            'thurs': row['thur'],
             'fri': row['fri'],
             'sat': row['sat'],
             'sun': row['sun']
@@ -86,17 +76,60 @@ def get_all_employees():
 
 
 # Function to update an employee
-def update_employee(emp_id, update_data):
-    update_fields = []
-    for key, value in update_data.items():
-        update_fields.append(f"{key} = '{value}'")
-    set_clause = ", ".join(update_fields)
-    query = f"UPDATE Employees SET {set_clause} WHERE emp_id = {emp_id}"
-    # Execute the query using execute_query function
-    execute_query(query)
+def update_employee(emp_id, data):
+    # Extract employee data from the input dictionary
+    name = data.get('name')  # Use get() to safely retrieve data, allowing for optional fields
+    primary_role = data.get('role')
+    secondary_role = data.get('secondaryRole')
+    wage = data.get('wage')
+    status = data.get('employmentType')  # Employment status (e.g., full-time, part-time)
+
+    # Prepare SQL query to update Employees table
+    update_employee_query = "UPDATE Employees SET "
+    update_set_values = []
+
+    # Build the SET clause of the UPDATE query based on provided fields
+    if name is not None:
+        update_set_values.append(f"name = '{name}'")
+    if primary_role is not None:
+        update_set_values.append(f"primary_role = '{primary_role}'")
+    if secondary_role is not None:
+        update_set_values.append(f"secondary_role = '{secondary_role}'")
+    if wage is not None:
+        update_set_values.append(f"wage = {wage}")
+    if status is not None:
+        update_set_values.append(f"status = '{status}'")
+
+    # Join the SET values into the UPDATE query
+    update_employee_query += ", ".join(update_set_values)
+    update_employee_query += f" WHERE emp_id = {emp_id}"
+
+    # Execute the update query to modify the employee's information
+    execute_query(update_employee_query)
+
+
+    update_availability_query = f"""
+            UPDATE Availability
+            SET mon = '{data.get('mon')}',
+                tues = '{data.get('tues')}',
+                wed = '{data.get('wed')}',
+                thur = '{data.get('thur')}',
+                fri = '{data.get('fri')}',
+                sat = '{data.get('sat')}',
+                sun = '{data.get('sun')}'
+            WHERE emp_id = {emp_id}
+        """
+
+    execute_query(update_availability_query)
+
+
 
 # Function to delete an employee
 def delete_employee(emp_id):
-    query = f"DELETE FROM Employees WHERE emp_id = {emp_id}"
-    # Execute the query using execute_query function
-    execute_query(query)
+    # Delete from Availability table first
+    availability_query = f"DELETE FROM Availability WHERE emp_id = {emp_id}"
+    execute_query(availability_query)
+    
+    # Then delete from Employees table
+    employee_query = f"DELETE FROM Employees WHERE emp_id = {emp_id}"
+    execute_query(employee_query)

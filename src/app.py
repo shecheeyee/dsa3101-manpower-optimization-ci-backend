@@ -5,34 +5,35 @@ from flask_cors import CORS
 from db_utils import execute_query
 from model.employee import  create_employee, update_employee, get_all_employees, delete_employee
 from demand_forecast import seven_days_demand_forecast
-from model.event import  create_event, update_event, get_all_events, delete_event
+from model.event import create_event, update_event, get_all_events, delete_event
+from model.schedule import create_schedule, update_schedule, get_all_schedules, delete_schedule
 import json
 import pandas as pd
 
 app = Flask(__name__)
 CORS(app)
 
-@app.route('/employees', methods=['POST'])
+@app.route('/employee', methods=['POST'])
 def create_new_employee():
     employee_data = request.json
-    create_employee(employee_data)
-    return jsonify({'message': 'Employee created successfully'}), 201
+    a = create_employee(employee_data)
+    return jsonify({'message': 'Employee created successfully' + str(a)}), 201
 
 # Function to retrieve all employees
-@app.route('/employees', methods=['GET'])
+@app.route('/employee', methods=['GET'])
 def get_employees():
     employees = get_all_employees()
-    return jsonify({'employees': employees})
+    return employees
 
 # Function to update an employee
-@app.route('/employees/<int:emp_id>', methods=['PUT'])
+@app.route('/employee/<int:emp_id>', methods=['PUT'])
 def update_e(emp_id):
     update_data = request.json
-    update_employee(emp_id, update_data)
-    return jsonify({'message': f'Employee with ID {emp_id} updated successfully'}), 200
+    a = update_employee(emp_id, update_data)
+    return jsonify({'message': f'Employee with ID {emp_id} updated successfully'+ str(a)}), 200
 
 # Function to delete an employee
-@app.route('/employees/<int:emp_id>', methods=['DELETE'])
+@app.route('/employee/<int:emp_id>', methods=['DELETE'])
 def delete_e(emp_id):
     delete_employee(emp_id)
     return jsonify({'message': f'Employee with ID {emp_id} deleted successfully'}), 200
@@ -48,30 +49,52 @@ def get_wage():
         return jsonify({'wage': wage_data})
     
 # Function to create a new event
-@app.route('/events', methods=['POST'])
+@app.route('/event', methods=['POST'])
 def create_new_event():
     event_data = request.json
     create_event(event_data)
     return jsonify({'message': 'Event created successfully'}), 201
 
 # Function to retrieve all events
-@app.route('/events', methods=['GET'])
+@app.route('/event', methods=['GET'])
 def get_events():
     events = get_all_events()
-    return jsonify({'events': events})
+    return events
 
 # Function to update an event
-@app.route('/events/<int:event_id>', methods=['PUT'])
+@app.route('/event/<int:event_id>', methods=['PUT'])
 def update_event_endpoint(event_id):
     update_data = request.json
     update_event(event_id, update_data)
     return jsonify({'message': f'Event with ID {event_id} updated successfully'}), 200
 
 # Function to delete an event
-@app.route('/events/<int:event_id>', methods=['DELETE'])
+@app.route('/event/<int:event_id>', methods=['DELETE'])
 def delete_event_endpoint(event_id):
     delete_event(event_id)
     return jsonify({'message': f'Event with ID {event_id} deleted successfully'}), 200
+
+@app.route('/schedule', methods=['POST'])
+def create_new_schedule():
+    schedule_data = request.json
+    create_schedule(schedule_data)
+    return jsonify({'message': 'Schedule created successfully'}), 201
+
+@app.route('/schedule', methods=['GET'])
+def get_schedules():
+    schedules = get_all_schedules()
+    return jsonify(schedules)
+
+@app.route('/schedule/<int:schedule_id>', methods=['PUT'])
+def update_schedule_endpoint(schedule_id):
+    update_data = request.json
+    update_schedule(schedule_id, update_data)
+    return jsonify({'message': f'Schedule with ID {schedule_id} updated successfully'}), 200
+
+@app.route('/schedule/<int:schedule_id>', methods=['DELETE'])
+def delete_schedule_endpoint(schedule_id):
+    delete_schedule(schedule_id)
+    return jsonify({'message': f'Schedule with ID {schedule_id} deleted successfully'}), 200
 
 
 @app.route("/post_demand_forecast", methods=["POST"])
