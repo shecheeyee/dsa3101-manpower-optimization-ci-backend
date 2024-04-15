@@ -1,22 +1,22 @@
-event_id,date,event_type,event_name,event_period,staffReq,num_pax,remark
-1,2024-01-03,Wings of Time,Random,Night,1,52,"Beautiful fireworks display"
-2,2024-01-04,Others,Wings of time,Morning,2,61,"Guests enjoyed the music"
-3,2024-01-06,Wings of Time,Random,Night,1,25,"Impressive light show"
-4,2024-01-06,Wings of Time,Tour,Night,2,57,"Educational tour experience"
-5,2024-01-07,Wings of Time,Random,Morning,3,31,"Spectacular water effects"
-6,2024-01-07,Wings of Time,Company,Night,2,63,"Corporate team-building event"
-7,2024-01-10,Wings of Time,Company,Morning,2,23,"Successful client engagement"
-8,2024-01-10,Others,Wings of time,Night,1,96,"Great family outing"
-9,2024-01-15,Others,Random,Morning,2,29,"Lunch buffet was a hit"
-10,2024-01-19,Others,Random,Night,1,85,"Captivating storytelling"
-11,2024-01-21,Wings of Time,Wings of time,Morning,2,89,"Engaging performances"
-12,2024-01-21,Wings of Time,Wings of time,Night,2,70,"Magical atmosphere"
-13,2024-01-23,Wings of Time,Company,Morning,1,84,"Positive feedback from attendees"
-14,2024-01-23,Others,Random,Night,2,76,"Interactive games for all ages"
-15,2024-01-24,Others,Company,Night,2,66,"Networking opportunities"
-16,2024-01-25,Wings of Time,Random,Night,3,55,"Unforgettable sunset views"
-17,2024-01-26,Others,Company,Morning,3,25,"Excellent service from staff"
-18,2024-01-27,Others,Company,Night,3,79,"Event ran smoothly"
-19,2024-01-30,Wings of Time,Tour,Night,3,63,"Insightful guided tour"
-20,2024-01-30,Others,Random,Night,1,37,"Relaxing ambiance"
-21, 2024-04-19,Wings of Time,Tour,Full,2,80,"Buffet across the day"
+event_id,date,event_name,event_period,staffReq,num_pax,remark
+1,2024-01-03,Random,Night,1,52,Beautiful fireworks display
+2,2024-01-04,Wings of time,Morning,2,61,Guests enjoyed the music
+3,2024-01-06,Random,Night,1,25,Impressive light show
+4,2024-01-06,Tour,Night,2,57,Educational tour experience
+5,2024-01-07,Random,Morning,3,31,Spectacular water effects
+6,2024-01-07,Company,Night,2,63,Corporate team-building event
+7,2024-01-10,Company,Morning,2,23,Successful client engagement
+8,2024-01-10,Wings of time,Night,1,96,Great family outing
+9,2024-01-15,Random,Morning,2,29,Lunch buffet was a hit
+10,2024-01-19,Random,Night,1,85,Captivating storytelling
+11,2024-01-21,Wings of time,Morning,2,89,Engaging performances
+12,2024-01-21,Wings of time,Night,2,70,Magical atmosphere
+13,2024-01-23,Company,Morning,1,84,Positive feedback from attendees
+14,2024-01-23,Random,Night,2,76,Interactive games for all ages
+15,2024-01-24,Company,Night,2,66,Networking opportunities
+16,2024-01-25,Random,Night,3,55,Unforgettable sunset views
+17,2024-01-26,Company,Morning,3,25,Excellent service from staff
+18,2024-01-27,Company,Night,3,79,Event ran smoothly
+19,2024-01-30,Tour,Night,3,63,Insightful guided tour
+20,2024-01-30,Random,Night,1,37,Relaxing ambiance
+21, 2024-04-19,Tour,Full,2,80,Buffet across the day
