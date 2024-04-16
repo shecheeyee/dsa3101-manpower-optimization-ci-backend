@@ -12,7 +12,6 @@ def create_employee(data):
     
     query = "SELECT MAX(emp_id) FROM Employees"
     emp_id = execute_query(query)[0]['MAX(emp_id)']+1
-    print(emp_id)
     # Prepare SQL query to insert into Employees table
     insert_employee_query = f"""
         INSERT INTO Employees (emp_id, name, dob, email, gender, primary_role, secondary_role, wage, status, address)
@@ -25,7 +24,7 @@ def create_employee(data):
     # Prepare SQL query to insert into Availability table
     insert_availability_query = f"""
         INSERT INTO Availability (emp_id, week, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday)
-        VALUES  ({emp_id}, '2023-12-31',{data['mon']}, {data['tues']}, {data['wed']}, {data['thurs']}, {data['fri']}, {data['sat']}, {data['sun']})
+        VALUES  ({emp_id}, '2023-12-31', '{data['mon']}', '{data['tues']}', '{data['wed']}', '{data['thurs']}', '{data['fri']}', '{data['sat']}', '{data['sun']}')
     """
     execute_query(insert_availability_query)
 
@@ -71,7 +70,6 @@ def get_all_employees():
             'sun': row['Sunday']
         }
         employees.append(employee)
-        
     return employees
 
 
