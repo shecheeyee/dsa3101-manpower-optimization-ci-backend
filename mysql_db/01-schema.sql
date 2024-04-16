@@ -17,13 +17,13 @@ CREATE TABLE IF NOT EXISTS Employees (
 CREATE TABLE IF NOT EXISTS Availability (
   emp_id INT REFERENCES Employees(emp_id),
   week DATE NOT NULL,
-  mon ENUM('None','Morning', 'Night', 'Full'),  -- Values: 0 (Unavailable), 1 (Shift 1), 2 (Shift 2), 3 (Both)
-  tues ENUM('None','Morning', 'Night', 'Full'),
-  wed ENUM('None','Morning', 'Night', 'Full'),
-  thur ENUM('None','Morning', 'Night', 'Full'),
-  fri ENUM('None','Morning', 'Night', 'Full'),
-  sat ENUM('None','Morning', 'Night', 'Full'),
-  sun ENUM('None','Morning', 'Night', 'Full'),
+  Monday ENUM('None','Morning', 'Night', 'Full'),  -- Values: 0 (Unavailable), 1 (Shift 1), 2 (Shift 2), 3 (Both)
+  Tuesday ENUM('None','Morning', 'Night', 'Full'),
+  Wednesday ENUM('None','Morning', 'Night', 'Full'),
+  Thursday ENUM('None','Morning', 'Night', 'Full'),
+  Friday ENUM('None','Morning', 'Night', 'Full'),
+  Saturday ENUM('None','Morning', 'Night', 'Full'),
+  Sunday ENUM('None','Morning', 'Night', 'Full'),
   CONSTRAINT unique_availability UNIQUE (emp_id, week)
 );
 
@@ -44,11 +44,10 @@ CREATE TABLE IF NOT EXISTS Schedules (
 CREATE TABLE IF NOT EXISTS Events (
   event_id INT PRIMARY KEY AUTO_INCREMENT,
   date DATE NOT NULL,
-  event_type ENUM('Wings of Time', 'Others'),
   event_name VARCHAR(50) NOT NULL,
   event_period ENUM('Morning', 'Night', 'Full') NOT NULL,
-  num_pax INT,
   staffReq INT,
+  num_pax INT,
   remark VARCHAR(255)  
 );
 
