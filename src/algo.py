@@ -241,7 +241,6 @@ def shift_algorithm():
         for shift in shifts:
             temp_lst.append(workers_per_shift[shift].value())
         service_staff_dict[day] = temp_lst
-    print(service_staff_dict)
     return [service_staff_dict, kitchen_staff_dict]
 
 def staffing_algorithm(ft_hours = 44, pt_hours = 35):
@@ -338,7 +337,6 @@ def staffing_algorithm(ft_hours = 44, pt_hours = 35):
             elif full_shift[(day, worker)].varValue == 1:
                 query = f"INSERT INTO Schedules (emp_id, week,day, shift,role,starttime,endtime) VALUES ({worker},'{global_week}','{day}','Full', 'Kitchen', '{kitchen_am_start}','{pm_end}')"
                 execute_query(query)
-                print(query)
         for worker in server_workers:
             if morning_shift[(day, worker)].varValue == 1:
                 query = f"INSERT INTO Schedules (emp_id, week,day, shift,role,starttime,endtime)) VALUES ({worker},'{global_week}','{day}','Morning', 'Service', '{service_am_start}','{am_end}')"
