@@ -15,8 +15,8 @@ def create_employee(data):
     print(emp_id)
     # Prepare SQL query to insert into Employees table
     insert_employee_query = f"""
-        INSERT INTO Employees (emp_id, first_name, last_name, dob, email, gender, primary_role, secondary_role, wage, status)
-        VALUES ('{emp_id}', '{name}', '2000-12-12', 'abc@gmail.com', 'M', '{primary_role}', '{secondary_role}', {wage}, '{status}')
+        INSERT INTO Employees (emp_id, name, dob, email, gender, primary_role, secondary_role, wage, status, address)
+        VALUES ('{emp_id}', '{name}', '2000-12-12', 'abc@gmail.com', 'M', '{primary_role}', '{secondary_role}', {wage}, '{status}','address')
     """
     
     # Execute the insert query to add the employee to Employees table
@@ -24,20 +24,20 @@ def create_employee(data):
 
     # Prepare SQL query to insert into Availability table
     insert_availability_query = f"""
-        INSERT INTO Availability (emp_id, week, mon, tues, wed, thur, fri, sat, sun)
+        INSERT INTO Availability (emp_id, week, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday)
         VALUES  ({emp_id}, '2023-12-31',{data['mon']}, {data['tues']}, {data['wed']}, {data['thurs']}, {data['fri']}, {data['sat']}, {data['sun']})
     """
     execute_query(insert_availability_query)
 
     # Return the emp_id of the newly created employee
-    return str(a) + str(secondary_role)
+    return a
 
 # Function to retrieve all employees
 def get_all_employees():
     query = """
         SELECT e.emp_id, e.name,
                e.primary_role, e.secondary_role, e.wage, e.status, e.address,
-               a.week, a.mon, a.tues, a.wed, a.thur, a.fri, a.sat, a.sun
+               a.week, a.Monday, a.Tuesday, a.Wednesday, a.Thursday, a.Friday, a.Saturday, a.Sunday
         FROM Employees e
         LEFT JOIN Availability a ON e.emp_id = a.emp_id
         WHERE a.week = (
@@ -62,16 +62,16 @@ def get_all_employees():
             'employmentType' : row['status'],
             'wage': row['wage'],
             'type': row['status'],
-            'mon': row['mon'],
-            'tues': row['tues'],
-            'wed': row['wed'],
-            'thurs': row['thur'],
-            'fri': row['fri'],
-            'sat': row['sat'],
-            'sun': row['sun']
+            'mon': row['Monday'],
+            'tues': row['Tuesday'],
+            'wed': row['Wednesday'],
+            'thurs': row['Thursday'],
+            'fri': row['Friday'],
+            'sat': row['Saturday'],
+            'sun': row['Sunday']
         }
         employees.append(employee)
-    
+        
     return employees
 
 
@@ -110,13 +110,13 @@ def update_employee(emp_id, data):
 
     update_availability_query = f"""
             UPDATE Availability
-            SET mon = '{data.get('mon')}',
-                tues = '{data.get('tues')}',
-                wed = '{data.get('wed')}',
-                thur = '{data.get('thur')}',
-                fri = '{data.get('fri')}',
-                sat = '{data.get('sat')}',
-                sun = '{data.get('sun')}'
+            SET Monday = '{data.get('mon')}',
+                Tuesday = '{data.get('tues')}',
+                Wednesday = '{data.get('wed')}',
+                Thursday = '{data.get('thurs')}',
+                Friday = '{data.get('fri')}',
+                Saturday = '{data.get('sat')}',
+                Sunday = '{data.get('sun')}'
             WHERE emp_id = {emp_id}
         """
 
