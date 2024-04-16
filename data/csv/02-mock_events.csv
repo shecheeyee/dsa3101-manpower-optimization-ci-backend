@@ -1,5 +1,5 @@
 event_id,date,event_name,event_period,staffReq,num_pax,remark
-1,2024-01-03,Random,Night,1,52,Beautiful fireworks display
+1,2024-01-03,Random,Full,1,52,Beautiful fireworks display
 2,2024-01-04,Wings of time,Morning,2,61,Guests enjoyed the music
 3,2024-01-06,Random,Night,1,25,Impressive light show
 4,2024-01-06,Tour,Night,2,57,Educational tour experience
@@ -12,11 +12,54 @@ event_id,date,event_name,event_period,staffReq,num_pax,remark
 11,2024-01-21,Wings of time,Morning,2,89,Engaging performances
 12,2024-01-21,Wings of time,Night,2,70,Magical atmosphere
 13,2024-01-23,Company,Morning,1,84,Positive feedback from attendees
-14,2024-01-23,Random,Night,2,76,Interactive games for all ages
+14,2024-01-23,Random,Full,2,76,Interactive games for all ages
 15,2024-01-24,Company,Night,2,66,Networking opportunities
 16,2024-01-25,Random,Night,3,55,Unforgettable sunset views
 17,2024-01-26,Company,Morning,3,25,Excellent service from staff
 18,2024-01-27,Company,Night,3,79,Event ran smoothly
 19,2024-01-30,Tour,Night,3,63,Insightful guided tour
 20,2024-01-30,Random,Night,1,37,Relaxing ambiance
-21, 2024-04-19,Tour,Full,2,80,Buffet across the day
+21,2024-02-01,Random,Night,2,48,cool
+22,2024-02-02,Wings of time,Night,2,48,Nice place
+23,2024-02-09,Company,Morning,2,31,Product launch breakfast
+24,2024-02-10,Random,Night,1,62,Live music performance
+25,2024-02-14,Wings of time,Night,2,71,Romantic candlelit dinner
+26,2024-02-17,Tour,Morning,3,45,Art gallery tour
+27,2024-02-21,Random,Night,2,98,Murder mystery dinner party
+28,2024-02-24,Company,Morning,1,58,Training session for new staff
+29,2024-02-24,Random,Night,3,32,Board game tournament
+30,2024-03-01,Random,Full,1,88,St. Patrick's Day Celebration
+31,2024-03-08,Company,Morning,3,54,Strategic planning meeting
+32,2024-03-09,Tour,Full,2,74,Behind the scenes museum tour
+33,2024-03-15,Wings of time,Night,2,49,Karaoke night
+34,2024-03-16,Random,Night,1,67,Comedy night
+35,2024-03-22,Company,Morning,3,29,Team building challenge
+36,2024-03-23,Tour,Morning,2,38,Historical landmarks tour
+37,2024-04-02,Tour,Full,2,80,Buffet across the day
+38,2024-04-07,Random,Morning,2,42,Easter Egg Hunt
+39,2024-04-12,Company,Night,1,34,Client appreciation dinner
+40,2024-04-16,Random,Morning,2,68,Workshop
+41,2024-04-16,Wings of time,Night,2,68,Art & Craft workshop
+42,2024-04-18,Random,Night,2,68,Art & Craft workshop
+43,2024-04-19,Random,Full,2,68,Art
+44,2024-04-20,Tour,Morning,3,92,Heritage trail walk
+45,2024-04-26,Company,Morning,2,41,Sales meeting
+46,2024-04-27,Random,Night,2,68,Cultural dance performance
+47,2024-04-28,Family,Morning,3,120,Children's Festival celebration
+48,2024-04-29,Random,Morning,1,52,Yoga in the park
+49,2024-04-30,Company,Morning,2,51,Team building workshop
+50,2024-05-02,Random,Night,1,73,Movie under the stars
+51,2024-05-03,Wings of time,Morning,2,85,Beautiful
+52,2024-05-04,Tour,Full,3,48,Sentosa Island exploration
+53,2024-05-07,Random,Morning,2,39,Birdwatching session
+54,2024-05-10,Company,Night,3,27,Farewell party for colleague
+55,2024-05-11,Random,Night,2,91,Live music night
+56,2024-05-12,Family,Morning,2,88,Family fun day at the zoo
+57,2024-05-14,Tour,Morning,1,62,Kayaking adventure
+58,2024-05-17,Random,Night,3,45,BBQ by the beach
+59,2024-05-18,Company,Morning,2,88,Product launch event
+60,2024-05-19,Random,Night,1,43,Cooking class: Local cuisine
+61,2024-05-21,Random,Night,1,58,Board game night
+62,2024-05-24,Wings of time,Morning,2,32,Magical
+63,2024-05-25,Company,Morning,3,72,Departmental brainstorming session
+64,2024-05-27,Random,Night,2,61,Live music performance
