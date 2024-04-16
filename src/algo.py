@@ -7,16 +7,6 @@ from db_utils import execute_query
 from utils import is_holiday, get_global_week, get_avail_data, get_event_data, wage_query, get_employee_data
 from datetime import datetime, timedelta
 
-
-# Establish a secure connection to the MySQL database using pymysql
-connection = pymysql.connect(
-    host='127.0.0.1',
-    user='root',
-    password='root',  # Replace with actual password or environment variable
-    port=3307,  # Adjust if necessary
-    database='mflg'
-)
-
 # Define global variables
 days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 weekday = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
