@@ -46,8 +46,8 @@ def get_wage():
     if 'error' in result:
         return jsonify(result), 500
     else:
-        wage_data = [{'day': row[0], 'role': row[1], 'wage': row[2]} for row in result]
-        return jsonify({'wage': wage_data})
+        wage_data = [{'day': row["day"], 'role': row["role"], 'wage': row["wage"]} for row in result]
+        return wage_data
     
 # Function to create a new event
 @app.route('/event', methods=['POST'])
@@ -121,8 +121,8 @@ def get_past_demand():
     if 'error' in result:
         return jsonify(result), 500
     else:
-        past_demand_data = [{'Date': row[0], 'Day': row[1], 'Time': str(row[2]), "actualCustomers": row[3]} for row in result]
-        return jsonify(past_demand_data)
+        past_demand_data = [{'Date': row["Date"], 'Day': row["Day"], 'Time': str(row["Time"]), "actualCustomers": row["actualCustomers"]} for row in result]
+        return past_demand_data
 
 @app.route("/post_demand_forecast", methods=["POST"])
 def store_demand_forecast():
@@ -148,8 +148,8 @@ def get_demand_forecast():
     if 'error' in result:
         return jsonify(result), 500
     else:
-        demand_forecast_data = [{'Date': row[0], 'Day': row[1], 'Time': str(row[2]), "actualCustomers": row[3]} for row in result]
-        return jsonify(demand_forecast_data)
+        demand_forecast_data = [{'Date': row["Date"], 'Day': row["Day"], 'Time': str("Time"), "actualCustomers": row["expectedCustomers"]} for row in result]
+        return demand_forecast_data
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
