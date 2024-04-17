@@ -15,19 +15,15 @@ def execute_query(query):
         cursor = connection.cursor()
         cursor.execute(query)
         if query.strip().lower().startswith('select'):
-            if "pastdemand" in query.strip().lower() or "demandforecast" in query.strip().lower() or "wage" in query.strip().lower():
-                result = cursor.fetchall()
-                return result
-            else:
-                # Fetch column names from cursor description
-                column_names = [desc[0] for desc in cursor.description]
-                # Fetch all rows
-                rows = cursor.fetchall()
-                # Convert rows to dictionaries
-                result = []
-                for row in rows:
-                    result.append(dict(zip(column_names, row)))
-                return result
+            # Fetch column names from cursor description
+            column_names = [desc[0] for desc in cursor.description]
+            # Fetch all rows
+            rows = cursor.fetchall()
+            # Convert rows to dictionaries
+            result = []
+            for row in rows:
+                result.append(dict(zip(column_names, row)))
+            return result
         else:
             connection.commit()
             return {'message': 'Query executed successfully.'}
