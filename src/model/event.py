@@ -39,7 +39,6 @@ def get_all_events():
         mapped_event = {
             'id': event['event_id'],  # Assuming 'event_id' is the primary key
             'eventName': event['event_name'],
-            'eventType': event['event_type'],  # Convert to Enum
             'eventDate': event['date'].strftime('%Y-%m-%d'),  # Format date as string
             'eventSession': event['event_period'],  # Convert to Enum
             'numPax': event['num_pax'],
