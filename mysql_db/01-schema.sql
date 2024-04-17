@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS Employees (
   primary_role ENUM('Manager', 'Service', 'Kitchen'),
   secondary_role ENUM('Manager', 'Service', 'Kitchen'),
   wage DECIMAL(10,2), 
-  status ENUM('Part time', 'Full time'),
+  status ENUM('Part Time', 'Full Time'),
   address VARCHAR(256)
 );
 
