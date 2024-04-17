@@ -7,6 +7,7 @@ from model.employee import  create_employee, update_employee, get_all_employees,
 from demand_forecast import seven_days_demand_forecast
 from model.event import create_event, update_event, get_all_events, delete_event
 from model.schedule import create_schedule, update_schedule, get_all_schedules, delete_schedule
+from algo import staffing_algorithm
 import json
 import pandas as pd
 
@@ -84,6 +85,12 @@ def create_new_schedule():
 def get_schedules():
     schedules = get_all_schedules()
     return jsonify(schedules)
+
+@app.route("/post_schedule", methods=["POST"])
+def store_opt_schedule():
+    # staffing_algorithm() function executes the scheduling algorithm and stores the result in the database
+    staffing_algorithm()
+    return jsonify({"message": "Data stored successfully"})
 
 @app.route('/schedule/<int:schedule_id>', methods=['PUT'])
 def update_schedule_endpoint(schedule_id):
