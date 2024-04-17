@@ -16,7 +16,7 @@ def create_employee(data):
     # Prepare SQL query to insert into Employees table
     insert_employee_query = f"""
         INSERT INTO Employees (emp_id, name, dob, email, gender, primary_role, secondary_role, wage, status, address)
-        VALUES ('{emp_id}', '{name}', '2000-12-12', 'abc@gmail.com', 'M', '{primary_role}', '{secondary_role}', {wage}, '{status}','address')
+        VALUES ('{emp_id}', '{name}', '2000-12-12', 'abc@gmail.com', 'M', '{primary_role}', '{secondary_role}', '{wage}', '{status}','address')
     """
     
     # Execute the insert query to add the employee to Employees table
