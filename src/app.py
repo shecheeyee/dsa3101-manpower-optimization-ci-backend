@@ -75,7 +75,7 @@ def create_new_event():
 
 # Function to create events from the uploaded csv
 @app.route('/events', methods=['POST'])
-def create_new_event():
+def create_new_events():
     event_data = request.json
     create_events(event_data)
     return jsonify({'message': 'Event created successfully'}), 201
