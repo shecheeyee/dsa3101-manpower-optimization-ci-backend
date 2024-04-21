@@ -86,10 +86,13 @@ def get_schedules():
     schedules = get_all_schedules()
     return jsonify(schedules)
 
-@app.route("/post_schedule", methods=["POST"])
+@app.route("/generate_schedule", methods=["POST"])
 def store_opt_schedule():
+    working_hours_limit = request.json
+    ft_hours = working_hours_limit["maxHrFT"]
+    pt_hours = working_hours_limit["maxHrPT"]
     # staffing_algorithm() function executes the scheduling algorithm and stores the result in the database
-    staffing_algorithm()
+    staffing_algorithm(ft_hours=ft_hours, pt_hours=pt_hours)
     return jsonify({"message": "Data stored successfully"})
 
 @app.route('/schedule/<int:schedule_id>', methods=['PUT'])
