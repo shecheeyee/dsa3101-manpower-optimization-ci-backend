@@ -3,8 +3,8 @@ USE mflg;  -- Switch to your database
 LOAD DATA INFILE '/var/lib/mysql-files/csv/00-mock_emp_details.csv'
 INTO TABLE Employees
 FIELDS TERMINATED BY ','  
-LINES TERMINATED BY '\n'  
-IGNORE 1 LINES;  
+LINES TERMINATED BY '\r\n'  
+IGNORE 1 LINES;
 
 LOAD DATA INFILE '/var/lib/mysql-files/csv/01-mock_availability.csv'
 INTO TABLE Availability
