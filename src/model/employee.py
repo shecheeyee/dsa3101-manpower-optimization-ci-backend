@@ -4,18 +4,19 @@ from db_utils import execute_query
 # Function to create a new employee
 def create_employee(data):
     # Extract employee data from the input dictionary
-    name = data['name']
-    primary_role = data['role']
-    secondary_role = data['secondaryRole']
-    wage = data['wage']
-    status = data['employmentType']  # Employment status (e.g., full-time, part-time)
+    name = data.get('name')
+    primary_role = data.get('role')
+    secondary_role = data.get('secondaryRole')
+    wage = data.get('wage')
+    status = data.get('employmentType')  # Employment status (e.g., full-time, part-time)
     
     query = "SELECT MAX(emp_id) FROM Employees"
-    emp_id = execute_query(query)[0]['MAX(emp_id)']+1
+    emp_id = execute_query(query)[0]['MAX(emp_id)'] + 1
+    
     # Prepare SQL query to insert into Employees table
     insert_employee_query = f"""
-        INSERT INTO Employees (emp_id, name, dob, email, gender, primary_role, secondary_role, wage, status, address)
-        VALUES ('{emp_id}', '{name}', '2000-12-12', 'abc@gmail.com', 'M', '{primary_role}', '{secondary_role}', {wage}, '{status}','address')
+        INSERT INTO Employees (emp_id, name primary_role, secondary_role, wage, status)
+        VALUES ('{emp_id}', '{name}', '{primary_role}', '{secondary_role}', {wage}, '{status}')
     """
     
     # Execute the insert query to add the employee to Employees table
@@ -24,18 +25,50 @@ def create_employee(data):
     # Prepare SQL query to insert into Availability table
     insert_availability_query = f"""
         INSERT INTO Availability (emp_id, week, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday)
-        VALUES  ({emp_id}, '2023-12-31', '{data['mon']}', '{data['tues']}', '{data['wed']}', '{data['thurs']}', '{data['fri']}', '{data['sat']}', '{data['sun']}')
+        VALUES  ({emp_id}, '2023-12-31', '{data.get('mon')}', '{data.get('tues')}', '{data.get('wed')}', '{data.get('thurs')}', '{data.get('fri')}', '{data.get('sat')}', '{data.get('sun')}')
     """
-    execute_query(insert_availability_query)
+    a = execute_query(insert_availability_query)
 
     # Return the emp_id of the newly created employee
+    return a
+
+# Function to create employees
+def create_employees(employees_data_list):
+    query = "SELECT MAX(emp_id) FROM Employees"
+    emp_id = execute_query(query)[0]['MAX(emp_id)'] + 1
+    
+    for data in employees_data_list:
+        # Extract employee data from the input dictionary
+        name = data.get('name')
+        primary_role = data.get('role')
+        secondary_role = data.get('secondaryRole')
+        wage = data.get('wage')
+        status = data.get('employmentType')  # Employment status (e.g., full-time, part-time)
+        
+        # Prepare SQL query to insert into Employees table
+        insert_employee_query = f"""
+            INSERT INTO Employees (emp_id, name, primary_role, secondary_role, wage, status)
+            VALUES ('{emp_id}', '{name}', '{primary_role}', '{secondary_role}', {wage}, '{status}')
+        """
+        
+        # Execute the insert query to add the employee to Employees table
+        a = execute_query(insert_employee_query)
+        
+        # Prepare SQL query to insert into Availability table
+        insert_availability_query = f"""
+            INSERT INTO Availability (emp_id, week, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday)
+            VALUES  ({emp_id}, '2023-12-31', '{data.get('mon')}', '{data.get('tues')}', '{data.get('wed')}', '{data.get('thurs')}', '{data.get('fri')}', '{data.get('sat')}', '{data.get('sun')}')
+        """
+        execute_query(insert_availability_query)
+        
+        emp_id += 1  # Increment emp_id for the next employee
     return a
 
 # Function to retrieve all employees
 def get_all_employees():
     query = """
         SELECT e.emp_id, e.name,
-               e.primary_role, e.secondary_role, e.wage, e.status, e.address,
+               e.primary_role, e.secondary_role, e.wage, e.status,
                a.week, a.Monday, a.Tuesday, a.Wednesday, a.Thursday, a.Friday, a.Saturday, a.Sunday
         FROM Employees e
         LEFT JOIN Availability a ON e.emp_id = a.emp_id

@@ -2,15 +2,11 @@ USE mflg;
 
 CREATE TABLE IF NOT EXISTS Employees (
   emp_id INT PRIMARY KEY AUTO_INCREMENT,
-  name VARCHAR(50) NOT NULL,
-  dob DATE NOT NULL,
-  email VARCHAR(50) NOT NULL,
-  gender ENUM('M', 'F') NOT NULL,
+  name VARCHAR(50) NOT NULL UNIQUE,
   primary_role ENUM('Manager', 'Service', 'Kitchen'),
   secondary_role ENUM('Manager', 'Service', 'Kitchen'),
   wage DECIMAL(10,2), 
-  status ENUM('Part Time', 'Full Time'),
-  address VARCHAR(256)
+  status ENUM('Part Time', 'Full Time')
 );
 
 

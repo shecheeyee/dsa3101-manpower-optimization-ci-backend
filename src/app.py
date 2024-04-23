@@ -3,22 +3,39 @@ from typing import List, Dict
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from db_utils import execute_query
-from model.employee import  create_employee, update_employee, get_all_employees, delete_employee
+from model.employee import  create_employee, create_employees, update_employee, get_all_employees, delete_employee
 from demand_forecast import seven_days_demand_forecast
-from model.event import create_event, update_event, get_all_events, delete_event
+from model.event import create_event, create_events, update_event, get_all_events, delete_event
 from model.schedule import create_schedule, update_schedule, get_all_schedules, delete_schedule
 from algo import staffing_algorithm
-import json
 import pandas as pd
 
 app = Flask(__name__)
 CORS(app)
 
+# Function to create a new employee individually
 @app.route('/employee', methods=['POST'])
 def create_new_employee():
     employee_data = request.json
     a = create_employee(employee_data)
-    return jsonify({'message': 'Employee created successfully' + str(a)}), 201
+    return jsonify({'message': 'Employee created successfully'}), 201
+
+# Function to create employees from the uploaded csv
+@app.route('/employees', methods=['POST'])
+def create_new_employees():
+    try:
+        data = request.get_json()
+
+        if not isinstance(data, list):
+            return jsonify({'error': 'Invalid data format, expected list of dictionaries'}), 400
+
+        # Process each row in the CSV data
+        a = create_employees(data)
+        app.logger.error(a)
+        return jsonify({'message': 'Employees created successfully'}), 200
+    except Exception as e:
+        app.logger.error("Error processing CSV data: %s", e)
+        return jsonify({'error': 'Failed to process CSV data'}), 500
 
 # Function to retrieve all employees
 @app.route('/employee', methods=['GET'])
@@ -49,11 +66,18 @@ def get_wage():
         wage_data = [{'day': row["day"], 'role': row["role"], 'wage': row["wage"]} for row in result]
         return wage_data
     
-# Function to create a new event
+# Function to create a new event individually
 @app.route('/event', methods=['POST'])
 def create_new_event():
     event_data = request.json
     create_event(event_data)
+    return jsonify({'message': 'Event created successfully'}), 201
+
+# Function to create events from the uploaded csv
+@app.route('/events', methods=['POST'])
+def create_new_events():
+    event_data = request.json
+    create_events(event_data)
     return jsonify({'message': 'Event created successfully'}), 201
 
 # Function to retrieve all events
