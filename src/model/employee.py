@@ -1,5 +1,9 @@
 # Import the execute_query function from db_utils.py
 from db_utils import execute_query
+from datetime import datetime
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
 
 # Function to create a new employee
 def create_employee(data):
@@ -164,3 +168,207 @@ def delete_employee(emp_id):
     # Then delete from Employees table
     employee_query = f"DELETE FROM Employees WHERE emp_id = {emp_id}"
     execute_query(employee_query)
+
+
+#Function to get list of wages cost for for each month between two months (inclusive)
+def get_full_time_wages(start_mmyy, end_mmyy):
+    # Parse input month-year values (MMYY) to extract month and year
+    start_month = int(start_mmyy[:2])
+    start_year = int(start_mmyy[2:])
+    end_month = int(end_mmyy[:2])
+    end_year = int(end_mmyy[2:])
+    
+    # List to store monthly total sum of wages for full-time employees
+    monthly_totals = []
+    
+    # Iterate over the months in the specified range
+    current_month = start_month
+    current_year = start_year
+    while (current_year < end_year or (current_year == end_year and current_month <= end_month)):
+        # SQL query to retrieve total sum of wages for full-time employees with relevant schedules within the current month
+        query = f"""
+            SELECT e.name, e.wage, s.starttime, s.endtime
+            FROM Employees e
+            JOIN Schedules s ON e.emp_id = s.emp_id
+            WHERE e.status = 'Full Time'
+            AND YEAR(s.week) = {current_year}
+            AND MONTH(s.week) = {current_month}
+        """
+        
+        # Execute the query to retrieve the total sum of wages for the current month
+        result = execute_query(query)
+
+        total_wages  = 0.0
+        for row in result:
+            wage = float(row['wage'])
+            total_wages += wage
+        
+        # Append the total sum of wages for the current month to the monthly_totals list
+        monthly_totals.append(total_wages)
+        
+        # Move to the next month
+        current_month += 1
+        if current_month > 12:
+            current_month = 1
+            current_year += 1
+    
+    return monthly_totals
+
+
+# Function to calculate total wage expenditure for part-time employees for each month between two months (inclusive)
+def get_part_time_wages(start_mmyyyy, end_mmyyyy):
+    # Parse input month-year values (MMYY) to extract month and year
+    start_month = int(start_mmyyyy[:2])
+    start_year = int(start_mmyyyy[2:])
+    end_month = int(end_mmyyyy[:2])
+    end_year = int(end_mmyyyy[2:])
+    
+    # List to store monthly total wage expenditures
+    monthly_expenditures = []
+    
+    # Iterate over the months in the specified range
+    current_month = start_month
+    current_year = start_year
+    while (current_year < end_year or (current_year == end_year and current_month <= end_month)):
+        # SQL query to retrieve part-time employees' wage and hours worked within the current month
+        query = f"""
+            SELECT e.name, e.wage, s.starttime, s.endtime
+            FROM Employees e
+            JOIN Schedules s ON e.emp_id = s.emp_id
+            WHERE e.status = 'Part Time'
+            AND YEAR(s.week) = {current_year}
+            AND MONTH(s.week) = {current_month}
+        """
+        
+        # Execute the query to retrieve part-time employees' data for the current month
+        result = execute_query(query)
+        # Variable to store total wage expenditure for the current month
+        total_wage_expenditure = 0.0
+        # Process the query result to calculate total wage expenditure for the current month
+        for row in result:
+            wage = float(row['wage'])
+            shift_start = row['starttime']
+            shift_end = row['endtime']
+            
+            # Calculate hours worked in the shift
+            hours_worked = (shift_end - shift_start).total_seconds() / 3600.0
+            
+            # Calculate wage expenditure for the current shift
+            shift_wage_expenditure = wage * hours_worked
+            
+            # Accumulate the shift wage expenditure to total wage expenditure for the current month
+            total_wage_expenditure += shift_wage_expenditure
+        
+        # Append the total wage expenditure for the current month to the monthly_expenditures list
+        monthly_expenditures.append(total_wage_expenditure)
+        
+        # Move to the next month
+        current_month += 1
+        if current_month > 12:
+            current_month = 1
+            current_year += 1
+    
+    return monthly_expenditures
+
+
+#Function to get list of wages cost for for each month between two months (inclusive)
+def get_full_time_wages(start_mmyy, end_mmyy, role):
+    # Parse input month-year values (MMYY) to extract month and year
+    start_month = int(start_mmyy[:2])
+    start_year = int(start_mmyy[2:])
+    end_month = int(end_mmyy[:2])
+    end_year = int(end_mmyy[2:])
+    
+    # List to store monthly total sum of wages for full-time employees
+    monthly_totals = []
+    
+    # Iterate over the months in the specified range
+    current_month = start_month
+    current_year = start_year
+    while (current_year < end_year or (current_year == end_year and current_month <= end_month)):
+        # SQL query to retrieve total sum of wages for full-time employees with relevant schedules within the current month
+        query = f"""
+            SELECT e.name, e.wage, s.starttime, s.endtime
+            FROM Employees e
+            JOIN Schedules s ON e.emp_id = s.emp_id
+            WHERE e.status = 'Full Time'
+            AND YEAR(s.week) = {current_year}
+            AND MONTH(s.week) = {current_month}
+            AND e.role = {role}
+        """
+        
+        # Execute the query to retrieve the total sum of wages for the current month
+        result = execute_query(query)
+
+        total_wages  = 0.0
+        for row in result:
+            wage = float(row['wage'])
+            total_wages += wage
+        
+        # Append the total sum of wages for the current month to the monthly_totals list
+        monthly_totals.append(total_wages)
+        
+        # Move to the next month
+        current_month += 1
+        if current_month > 12:
+            current_month = 1
+            current_year += 1
+    
+    return monthly_totals
+
+
+# Function to calculate total wage expenditure for part-time employees for each month between two months (inclusive)
+def get_part_time_wages_role(start_mmyyyy, end_mmyyyy,role):
+    # Parse input month-year values (MMYY) to extract month and year
+    start_month = int(start_mmyyyy[:2])
+    start_year = int(start_mmyyyy[2:])
+    end_month = int(end_mmyyyy[:2])
+    end_year = int(end_mmyyyy[2:])
+    
+    # List to store monthly total wage expenditures
+    monthly_expenditures = []
+    
+    # Iterate over the months in the specified range
+    current_month = start_month
+    current_year = start_year
+    while (current_year < end_year or (current_year == end_year and current_month <= end_month)):
+        # SQL query to retrieve part-time employees' wage and hours worked within the current month
+        query = f"""
+            SELECT e.name, e.wage, s.starttime, s.endtime, e.role
+            FROM Employees e
+            JOIN Schedules s ON e.emp_id = s.emp_id
+            WHERE e.status = 'Part Time'
+            AND YEAR(s.week) = {current_year}
+            AND MONTH(s.week) = {current_month}
+            AND e.role = {role}
+        """
+        
+        # Execute the query to retrieve part-time employees' data for the current month
+        result = execute_query(query)
+        # Variable to store total wage expenditure for the current month
+        total_wage_expenditure = 0.0
+        # Process the query result to calculate total wage expenditure for the current month
+        for row in result:
+            wage = float(row['wage'])
+            shift_start = row['starttime']
+            shift_end = row['endtime']
+            
+            # Calculate hours worked in the shift
+            hours_worked = (shift_end - shift_start).total_seconds() / 3600.0
+            
+            # Calculate wage expenditure for the current shift
+            shift_wage_expenditure = wage * hours_worked
+            
+            # Accumulate the shift wage expenditure to total wage expenditure for the current month
+            total_wage_expenditure += shift_wage_expenditure
+        
+        # Append the total wage expenditure for the current month to the monthly_expenditures list
+        monthly_expenditures.append(total_wage_expenditure)
+        
+        # Move to the next month
+        current_month += 1
+        if current_month > 12:
+            current_month = 1
+            current_year += 1
+    
+    return monthly_expenditures
