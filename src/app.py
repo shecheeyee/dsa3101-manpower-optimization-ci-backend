@@ -57,16 +57,6 @@ def update_e(emp_id):
 def delete_e(emp_id):
     delete_employee(emp_id)
     return jsonify({'message': f'Employee with ID {emp_id} deleted successfully'}), 200
-
-@app.route('/wage', methods=['GET'])
-def get_wage():
-    query = 'SELECT * FROM Wage'
-    result = execute_query(query)
-    if 'error' in result:
-        return jsonify(result), 500
-    else:
-        wage_data = [{'day': row["day"], 'role': row["role"], 'wage': row["wage"]} for row in result]
-        return wage_data
     
 # Function to create a new event individually
 @app.route('/event', methods=['POST'])
