@@ -1,6 +1,8 @@
 ## DSA3101 BACKEND
 This is the backend for the DSA3101 project. It is a RESTful API that provides endpoints for the frontend to interact with the database. The backend is built using Flask, a Python web framework. The database used is mySQL.
 
+To deploy this application along with the frontend, see our [deployment repo](https://github.com/kevin-pek/dsa3101-deployment).
+
 ### How to run the backend
 1. git clone the repository
 2. `docker-compose build --no-cache`
