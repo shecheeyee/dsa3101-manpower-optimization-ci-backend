@@ -50,13 +50,15 @@ This is the backend for the DSA3101 project. It is a RESTful API that provides e
 
 
 ### Endpoints
-1. Create Employee: POST /employee
+1. Create Individual Employee: POST /employee
+1. Create Mutilple Employees: POST /employees
 2. Get Employees: GET /employee
 3. Update Employee: PUT /employee/<emp_id>
 4. Delete Employee: DELETE /employee/<emp_id>
 5. Get Wage: GET /wage
 6. Create Event: POST /event
-7. Get Events: GET /event
+6. Create Individual Event: POST /event
+7. Get Mutilple Events: GET /events
 8. Update Event: PUT /event/<event_id>
 9. Delete Event: DELETE /event/<event_id>
 10. Create Schedule: POST /schedule
