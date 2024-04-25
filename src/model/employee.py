@@ -272,7 +272,7 @@ def get_part_time_wages(start_mmyyyy, end_mmyyyy):
 
 
 #Function to get list of wages cost for for each month between two months (inclusive)
-def get_full_time_wages(start_mmyy, end_mmyy, role):
+def get_full_time_wages_role(start_mmyy, end_mmyy, role):
     # Parse input month-year values (MMYY) to extract month and year
     start_month = int(start_mmyy[:2])
     start_year = int(start_mmyy[2:])
