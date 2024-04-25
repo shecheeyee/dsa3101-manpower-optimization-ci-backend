@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date,datetime, timedelta 
 import pandas as pd
 from holidays import SG, Singapore
 from db_utils import execute_query
@@ -69,17 +69,12 @@ def year_holidays(year):
 
 
 def get_global_week():
-  """
-  Retrieves the most recent week from the 'Availability' table.
+  # Get sunday of the current week
+  today = datetime.now()
+  sunday = today - timedelta(days=today.weekday() + 1)
+  sunday_formatted = sunday.strftime("%Y-%m-%d")
+  return sunday_formatted
 
-  Returns:
-      str: The latest week as a string formatted as 'YYYY-MM-DD'.
-  """
-  query = "SELECT MAX(week) AS latest_date FROM Availability"
-  global_week = execute_query(query)
-  date_obj = global_week[0]['latest_date']
-  global_week = date_obj.strftime('%Y-%m-%d')
-  return global_week
 
 def wage_query():
   """
@@ -131,3 +126,6 @@ def get_event_data():
   event_query = execute_query(query)
   df_events = pd.DataFrame(event_query)
   return df_events
+
+
+
