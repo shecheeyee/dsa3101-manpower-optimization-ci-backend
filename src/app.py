@@ -56,6 +56,7 @@ def delete_e(emp_id):
     delete_employee(emp_id)
     return jsonify({'message': f'Employee with ID {emp_id} deleted successfully'}), 200
 
+# Function to get wage data 
 @app.route('/wage', methods=['GET'])
 def get_wage():
     query = 'SELECT * FROM Wage'
@@ -99,17 +100,20 @@ def delete_event_endpoint(event_id):
     delete_event(event_id)
     return jsonify({'message': f'Event with ID {event_id} deleted successfully'}), 200
 
+# Function to create a new schedule
 @app.route('/schedule', methods=['POST'])
 def create_new_schedule():
     schedule_data = request.json
     a = create_schedule(schedule_data)
     return jsonify({'message': 'Schedule created successfully' + str(a)}), 201
 
+# Function to get all schedules for a week
 @app.route('/schedule', methods=['GET'])
 def get_schedules():
     schedules = get_all_schedules()
     return jsonify(schedules)
 
+# Function to create optimized schedule from `algo.py`
 @app.route("/generate_schedule", methods=["POST"])
 def store_opt_schedule():
     working_hours_limit = request.json
@@ -119,17 +123,20 @@ def store_opt_schedule():
     staffing_algorithm(ft_hours=ft_hours, pt_hours=pt_hours)
     return jsonify({"message": "Data stored successfully"})
 
+# Function to update a schedule
 @app.route('/schedule/<int:schedule_id>', methods=['PUT'])
 def update_schedule_endpoint(schedule_id):
     update_data = request.json
     update_schedule(schedule_id, update_data)
     return jsonify({'message': f'Schedule with ID {schedule_id} updated successfully'}), 200
 
+# Function to delete a schedule
 @app.route('/schedule/<int:schedule_id>', methods=['DELETE'])
 def delete_schedule_endpoint(schedule_id):
     delete_schedule(schedule_id)
     return jsonify({'message': f'Schedule with ID {schedule_id} deleted successfully'}), 200
 
+# Function to store past demand data
 @app.route("/post_past_demand", methods=["POST"])
 def post_past_demand():
     csv_file = request.files['file']
@@ -141,6 +148,7 @@ def post_past_demand():
             execute_query(query)
     return jsonify({"message": "Data stored successfully"})
 
+# Function to get past demand data
 @app.route("/get_past_demand", methods=["GET"])
 def get_past_demand():
     query = "SELECT * FROM PastDemand"
@@ -151,6 +159,7 @@ def get_past_demand():
         past_demand_data = [{'Date': row["Date"], 'Day': row["Day"], 'Time': str(row["Time"]), "actualCustomers": row["actualCustomers"]} for row in result]
         return past_demand_data
 
+# Function to store demand forecast data from `demand_forecast.py`
 @app.route("/post_demand_forecast", methods=["POST"])
 def store_demand_forecast():
     # Delete all rows from DemandForecast table
@@ -168,6 +177,7 @@ def store_demand_forecast():
         execute_query(query)
     return jsonify({"message": "Data stored successfully"})
 
+# Function to get demand forecast data
 @app.route("/get_demand_forecast", methods=["GET"])
 def get_demand_forecast():
     query = "SELECT * FROM DemandForecast"
