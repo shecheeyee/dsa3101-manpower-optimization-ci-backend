@@ -14,6 +14,7 @@ services:
       - ./data:/data  # Mount your source code directory to /app inside container
     depends_on:
       - mysql-db
+    restart: always
 
 
   mysql-db:
