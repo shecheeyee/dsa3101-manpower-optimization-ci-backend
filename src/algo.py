@@ -134,19 +134,20 @@ def shift_duration(workerid, shift):
             
 
     
-workers = df['emp_id'].tolist()  # 10 workers available, more than needed
+workers = df['emp_id'].tolist() 
 kitchen_workers = [worker for worker in workers if get_role(worker) == 'Kitchen']
 server_workers = [worker for worker in workers if get_role(worker) == 'Service']
 managers = [worker for worker in workers if get_role(worker) == 'Manager']
 
-
+# Define the shifting algorithm to optimise the number of workers required per day.
 def shift_algorithm():
+    # Get forecast data for the next 7 days
     data = seven_days_demand_forecast().iloc[:, -3:]
+    # Reformat the DataFrame
     pivot_df = data.pivot_table(index='Time', columns='Day', values='ExpectedCustomers', fill_value=0)
     pivot_df = pivot_df[days]
     pivot_df.index.name = None
     pivot_df.columns.name = None
-    # Transpose the DataFrame to have times as rows and days as columns
     hrs = ['1000', '1100', '1200', '1300', '1400', '1500', '1600', '1700', '1800', '1900', '2000', '2100']
     pivot_df.index = hrs
     current_week = pd.DataFrame({"date" : get_dates_and_day(), "day" : days})
@@ -165,7 +166,7 @@ def shift_algorithm():
     # Map the functions over all entries in the DataFrame and replace them
     df_kitchen_mapped = pivot_df.map(kitchen_required_func)
     df_service_mapped = pivot_df.map(service_required_func)
-
+    # Get maxiumum number of workers required for each time window
     time_windows_kitchen = {
         'Morning': df_kitchen_mapped['1000':'1200'].max(),
         'Afternoon' : df_kitchen_mapped['1200':'1800'].max(),
@@ -178,7 +179,7 @@ def shift_algorithm():
         'Afternoon': df_service_mapped['1200':'1800'].max(),
         'Night': df_service_mapped['1800':'2200'].max()
     }
-
+    # Add the number of staff required for each event
     for index, row in extracted_df.iterrows():
         period = row['event_period']
         event_day = row['day']
@@ -192,10 +193,9 @@ def shift_algorithm():
 
     df_time_windows_kitchen = pd.DataFrame(time_windows_kitchen)
     df_time_windows_service = pd.DataFrame(time_windows_service)
-
     shifts = ['Morning', 'Night', 'Full']
+    # Intialise the variables for kitchen staff
     kitchen_staff_dict = {}
-
     for day in days: 
         temp_lst = list()
         workers_per_shift = LpVariable.dicts("num_workers", shifts, lowBound=0, cat="Integer")
@@ -205,21 +205,21 @@ def shift_algorithm():
 
     # Minimize the number of workers
         shift_problem += lpSum(workers_per_shift[i] for i in shifts), "Objective"
-
+        # Constraint to ensure the number of workers assigned to a shift is greater than or equals to the number of workers required
         for t in range(num_time):
             shift_problem += lpSum([timings[t, j] * workers_per_shift[shifts[j]]] for j in range(num_shifts)) >= df_time_windows_kitchen.iloc[days.index(day),t]
-
+        # Constraint to ensure the number of workers assigned to a shift is less than or equals to the number of workers available
         for i in shifts:
             shift_problem += workers_per_shift[i] <= df_avail[df_avail['emp_id'].isin(kitchen_workers)][day].to_list().count(i)
-
+        # Solve the problem
         shift_problem.solve(solver = PULP_CBC_CMD(msg=0))
-
+        # Store the results
         for shift in shifts:
             temp_lst.append(workers_per_shift[shift].value())
         kitchen_staff_dict[day] = temp_lst
 
+    # Intialise the variables for service staff
     service_staff_dict = {}
-
     for day in days: 
         temp_lst = list()
         workers_per_shift = LpVariable.dicts("num_workers", shifts, lowBound=0, cat="Integer")
@@ -229,20 +229,23 @@ def shift_algorithm():
 
     # Minimize the number of workers
         shift_problem += lpSum(workers_per_shift[i] for i in shifts), "Objective"
-
+        # Constraint to ensure the number of workers assigned to a shift is greater than or equals to the number of workers required
         for t in range(num_time):
             shift_problem += lpSum([timings[t, j] * workers_per_shift[shifts[j]] for j in range(num_shifts)]) >= df_time_windows_service.iloc[days.index(day),t]
-
+        # Constraint to ensure the number of workers assigned to a shift is less than or equals to the number of workers available
         for i in shifts:
             shift_problem += workers_per_shift[i] <= df_avail[df_avail['emp_id'].isin(server_workers)][day].to_list().count(shift)
 
+        # Solve the problem
         shift_problem.solve(solver = PULP_CBC_CMD(msg=0))
 
+        # Store the results
         for shift in shifts:
             temp_lst.append(workers_per_shift[shift].value())
         service_staff_dict[day] = temp_lst
     return [service_staff_dict, kitchen_staff_dict]
 
+# Define the staffing algorithm
 def staffing_algorithm(ft_hours = 44, pt_hours = 35):
     opt_shift = shift_algorithm()
     kitchen_staff_dict,service_staff_dict = opt_shift[1], opt_shift[0]
@@ -254,9 +257,10 @@ def staffing_algorithm(ft_hours = 44, pt_hours = 35):
         return service_staff_dict[day][shift-1]
     ph_dict = get_public_holidays()
 
-
+    # Create the LP object, set up as a minimization problem --> since we want to minimize the total staff cost
     problem = LpProblem("Minimize Staff Costs", LpMinimize)
 
+    # intialize the variables
     morning_shift = LpVariable.dicts('Morning', [(day,worker) for worker in workers for day in days], cat ='Binary')
     night_shift = LpVariable.dicts('Night', [(day,worker) for worker in workers for day in days], cat ='Binary')
     full_shift = LpVariable.dicts('Full', [(day,worker) for worker in workers for day in days],cat ='Binary')
@@ -275,7 +279,7 @@ def staffing_algorithm(ft_hours = 44, pt_hours = 35):
         full_shift[(day, worker)]
     ) for day in days for worker in workers for shift_type in range(1, 4))
 
-
+    # Constraint to ensure worker is only assigned to one shift per day and that they are available
     for day in days:
         for worker in workers:
             problem += lpSum([morning_shift[(day,worker)], night_shift[(day,worker)], full_shift[(day,worker)]]) <= 1  # only one shift per day
@@ -297,6 +301,7 @@ def staffing_algorithm(ft_hours = 44, pt_hours = 35):
     # One Manager per day
     manager_dict = {}
     for day in days:
+        # Allocate one manager for full day if available, else one manager for morning and one for night
         check_full_shift = sum([get_avail(worker,day,3) for worker in managers])
         if check_full_shift  == 0:
             manager_dict[day] = 0
@@ -317,8 +322,9 @@ def staffing_algorithm(ft_hours = 44, pt_hours = 35):
                 shift_var = night_shift
             problem += lpSum([shift_var[(day, worker)] + full_shift[(day,worker)] for worker in kitchen_workers]) >= kitchen_required(day,shift_type) + kitchen_required(day,3)
             problem += lpSum([shift_var[(day, worker)] + full_shift[(day,worker)] for worker in server_workers]) >= service_required(day,shift_type) + service_required(day,3)
-        
+    # Solve the problenm
     problem.solve(solver = PULP_CBC_CMD(msg=0)) 
+    # Get status of Linear Program
     status = LpStatus[problem.status]
     # Insert into Schema DB
     kitchen_am_start = '08:00:00'
