@@ -58,6 +58,7 @@ def delete_e(emp_id):
     delete_employee(emp_id)
     return jsonify({'message': f'Employee with ID {emp_id} deleted successfully'}), 200
 
+# Function to get wage data 
 @app.route('/wage', methods=['GET'])
 def get_wage():
     query = 'SELECT * FROM Wage'
@@ -94,20 +95,23 @@ def delete_event_endpoint(event_id):
     delete_event(event_id)
     return jsonify({'message': f'Event with ID {event_id} deleted successfully'}), 200
 
-# Function to create schedules manually
+
+# Function to create a new schedule
 @app.route('/schedule', methods=['POST'])
 def create_new_schedule():
     schedule_data = request.json
     a = create_schedule(schedule_data)
     return jsonify({'message': 'Schedule created successfully' + str(a)}), 201
 
-# Function to get all schedules in databave
+
+# Function to get all schedules for a week
 @app.route('/schedule', methods=['GET'])
 def get_schedules():
     schedules = get_all_schedules()
     return jsonify(schedules)
 
-# Function to call our algorithm to generate the schedule
+
+# Function to create optimized schedule from `algo.py`
 @app.route("/generate_schedule", methods=["POST"])
 def store_opt_schedule():
     working_hours_limit = request.json
@@ -130,7 +134,8 @@ def delete_schedule_endpoint(schedule_id):
     delete_schedule(schedule_id)
     return jsonify({'message': f'Schedule with ID {schedule_id} deleted successfully'}), 200
 
-# Function to post past demand
+
+# Function to store past demand data
 @app.route("/post_past_demand", methods=["POST"])
 def post_past_demand():
     csv_file = request.files['file']
@@ -141,8 +146,8 @@ def post_past_demand():
             query = f"INSERT INTO PastDemand ({field_names}) VALUES ({field_values})"
             execute_query(query)
     return jsonify({"message": "Data stored successfully"})
-
-# Function to get past demand
+ 
+# Function to get past demand data
 @app.route("/get_past_demand", methods=["GET"])
 def get_past_demand():
     query = "SELECT * FROM PastDemand"
@@ -153,7 +158,8 @@ def get_past_demand():
         past_demand_data = [{'Date': row["Date"], 'Day': row["Day"], 'Time': str(row["Time"]), "actualCustomers": row["actualCustomers"]} for row in result]
         return past_demand_data
 
-# Function to post demand forecast
+
+# Function to store demand forecast data from `demand_forecast.py`
 @app.route("/post_demand_forecast", methods=["POST"])
 def store_demand_forecast():
     # Delete all rows from DemandForecast table
@@ -171,7 +177,7 @@ def store_demand_forecast():
         execute_query(query)
     return jsonify({"message": "Data stored successfully"})
 
-# Function to get demand forecase
+# Function to get demand forecast data
 @app.route("/get_demand_forecast", methods=["GET"])
 def get_demand_forecast():
     query = "SELECT * FROM DemandForecast"
@@ -182,7 +188,7 @@ def get_demand_forecast():
         demand_forecast_data = [{'Date': row["Date"], 'Day': row["Day"], 'Time': str("Time"), "actualCustomers": row["expectedCustomers"]} for row in result]
         return demand_forecast_data
     
-# Function to get total cost of 
+# Function to get total monthly cost for full timer and part timer
 @app.route('/total_cost_status', methods=['GET'])
 def calculate_total_expenditure_status():
     # Get start_mmyy and end_mmyy from request data
@@ -203,6 +209,7 @@ def calculate_total_expenditure_status():
     }
     return total_expenditure
 
+# Function to get total monthly cost based on role for Manager, Service and Kitchen
 @app.route('/total_cost_role', methods=['GET'])
 def calculate_total_expenditure_role():
     # Get start_mmyy and end_mmyy from request data
