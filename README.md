@@ -7,6 +7,48 @@ This is the backend for the DSA3101 project. It is a RESTful API that provides e
 3. `docker-compose up`
 4. Try the endpoints using Postman or any other API testing tool
 
+### Project Folder Structure
+.
+├── README.md
+├── data
+│   ├── csv
+│   │   ├── 00-mock_emp_details.csv
+│   │   ├── 01-mock_availability.csv
+│   │   ├── 02-mock_events.csv
+│   │   ├── 03-mock_wage.csv
+│   │   └── 04-mock_customer_demand_past.csv
+│   └── json
+│       ├── expected_customers.json
+│       └── public_holidays.json
+├── docker-compose.yml
+├── images
+│   └── good_old_days.jpg
+├── mysql_db
+│   ├── 00-create-db.sql
+│   ├── 01-schema.sql
+│   ├── 02-load-data.sql
+│   └── custom.cnf
+└── src
+    ├── Dockerfile
+    ├── algo.py
+    ├── app.py
+    ├── db_utils.py
+    ├── demand_forecast.py
+    ├── generate_data.py
+    ├── model
+    │   ├── __init__.py
+    │   ├── employee.py
+    │   ├── event.py
+    │   └── schedule.py
+    ├── requirements.txt
+    ├── test_app.py
+    ├── tests
+    │   ├── __init__.py
+    │   ├── test_app.py
+    │   └── test_utils.py
+    └── utils.py
+
+
 ### Endpoints
 1. Create Employee: POST /employee
 2. Get Employees: GET /employee
