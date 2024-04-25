@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS Employees (
 CREATE TABLE IF NOT EXISTS Availability (
   emp_id INT REFERENCES Employees(emp_id),
   week DATE NOT NULL,
-  Monday ENUM('None','Morning', 'Night', 'Full'),  -- Values: 0 (Unavailable), 1 (Shift 1), 2 (Shift 2), 3 (Both)
+  Monday ENUM('None','Morning', 'Night', 'Full'), 
   Tuesday ENUM('None','Morning', 'Night', 'Full'),
   Wednesday ENUM('None','Morning', 'Night', 'Full'),
   Thursday ENUM('None','Morning', 'Night', 'Full'),

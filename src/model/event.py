@@ -26,32 +26,7 @@ def create_event(data):
     
     query = f"INSERT INTO Events ({field_names}) VALUES ({field_values})"
     execute_query(query)
-    
-def create_events(events_data_list):
-    for data in events_data_list:
-        mapped_fields = {
-            'id': 'event_id',
-            'eventName': 'event_name',
-            'eventDate': 'date',
-            'eventSession': 'event_period',
-            'numPax': 'num_pax',
-            'staffReq': 'staffReq',
-            'remark': 'remark'
-        }
-        
-        db_fields = []
-        db_values = []
-        
-        for key, value in data.items():
-            if key in mapped_fields:
-                db_fields.append(mapped_fields[key])
-                db_values.append(f"'{value}'" if isinstance(value, str) else str(value))
-        
-        field_names = ', '.join(db_fields)
-        field_values = ', '.join(db_values)
-        
-        query = f"INSERT INTO Events ({field_names}) VALUES ({field_values})"
-        execute_query(query)
+
 
 # Function to retrieve all events
 def get_all_events():
