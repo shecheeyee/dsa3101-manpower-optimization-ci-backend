@@ -3,13 +3,15 @@ from typing import List, Dict
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from db_utils import execute_query
-from model.employee import  create_employee, create_employees, update_employee, get_all_employees, delete_employee
+from model.employee import  create_employee, create_employees, update_employee, get_all_employees, delete_employee, get_full_time_wages, get_part_time_wages, get_full_time_wages_role, get_part_time_wages_role
 from demand_forecast import seven_days_demand_forecast
-from model.event import create_event, create_events, update_event, get_all_events, delete_event
+from model.event import create_event, update_event, get_all_events, delete_event
 from model.schedule import create_schedule, update_schedule, get_all_schedules, delete_schedule
 from algo import staffing_algorithm
 import pandas as pd
+import logging
 
+logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
 CORS(app)
 
@@ -74,13 +76,6 @@ def create_new_event():
     create_event(event_data)
     return jsonify({'message': 'Event created successfully'}), 201
 
-# Function to create events from the uploaded csv
-@app.route('/events', methods=['POST'])
-def create_new_events():
-    event_data = request.json
-    create_events(event_data)
-    return jsonify({'message': 'Event created successfully'}), 201
-
 # Function to retrieve all events
 @app.route('/event', methods=['GET'])
 def get_events():
@@ -100,6 +95,7 @@ def delete_event_endpoint(event_id):
     delete_event(event_id)
     return jsonify({'message': f'Event with ID {event_id} deleted successfully'}), 200
 
+
 # Function to create a new schedule
 @app.route('/schedule', methods=['POST'])
 def create_new_schedule():
@@ -107,11 +103,13 @@ def create_new_schedule():
     a = create_schedule(schedule_data)
     return jsonify({'message': 'Schedule created successfully' + str(a)}), 201
 
+
 # Function to get all schedules for a week
 @app.route('/schedule', methods=['GET'])
 def get_schedules():
     schedules = get_all_schedules()
     return jsonify(schedules)
+
 
 # Function to create optimized schedule from `algo.py`
 @app.route("/generate_schedule", methods=["POST"])
@@ -136,6 +134,7 @@ def delete_schedule_endpoint(schedule_id):
     delete_schedule(schedule_id)
     return jsonify({'message': f'Schedule with ID {schedule_id} deleted successfully'}), 200
 
+
 # Function to store past demand data
 @app.route("/post_past_demand", methods=["POST"])
 def post_past_demand():
@@ -147,7 +146,7 @@ def post_past_demand():
             query = f"INSERT INTO PastDemand ({field_names}) VALUES ({field_values})"
             execute_query(query)
     return jsonify({"message": "Data stored successfully"})
-
+ 
 # Function to get past demand data
 @app.route("/get_past_demand", methods=["GET"])
 def get_past_demand():
@@ -158,6 +157,7 @@ def get_past_demand():
     else:
         past_demand_data = [{'Date': row["Date"], 'Day': row["Day"], 'Time': str(row["Time"]), "actualCustomers": row["actualCustomers"]} for row in result]
         return past_demand_data
+
 
 # Function to store demand forecast data from `demand_forecast.py`
 @app.route("/post_demand_forecast", methods=["POST"])
@@ -187,6 +187,47 @@ def get_demand_forecast():
     else:
         demand_forecast_data = [{'Date': row["Date"], 'Day': row["Day"], 'Time': str("Time"), "actualCustomers": row["expectedCustomers"]} for row in result]
         return demand_forecast_data
+    
+# Function to get total monthly cost for full timer and part timer
+@app.route('/total_cost_status', methods=['GET'])
+def calculate_total_expenditure_status():
+    # Get start_mmyy and end_mmyy from request data
+    request_data = request.json
+    start_mmyy = request_data.get('start_mmyy')
+    end_mmyy = request_data.get('end_mmyy')
+    
+    # Calculate total expenditure for full-time employees between the specified months
+    full_time_expenditure = get_full_time_wages(start_mmyy, end_mmyy)
+    
+    # Calculate total expenditure for part-time employees between the specified months
+    part_time_expenditure = get_part_time_wages(start_mmyy, end_mmyy)
+    
+    # Combine the total expenditures into a single list
+    total_expenditure = {
+        'full_time_expenditure': full_time_expenditure,
+        'part_time_expenditure': part_time_expenditure
+    }
+    return total_expenditure
+
+# Function to get total monthly cost based on role for Manager, Service and Kitchen
+@app.route('/total_cost_role', methods=['GET'])
+def calculate_total_expenditure_role():
+    # Get start_mmyy and end_mmyy from request data
+    request_data = request.json
+    start_mmyy = request_data.get('start_mmyy')
+    end_mmyy = request_data.get('end_mmyy')
+    
+    manager_expenditure = [ft_wage + pt_wage for ft_wage, pt_wage in zip(get_full_time_wages_role(start_mmyy, end_mmyy, 'Manager'), get_part_time_wages_role(start_mmyy, end_mmyy, 'Manager'))]
+    service_expenditure = [ft_wage + pt_wage for ft_wage, pt_wage in zip(get_full_time_wages_role(start_mmyy, end_mmyy, 'Service'), get_part_time_wages_role(start_mmyy, end_mmyy, 'Service'))]
+    kitchen_expenditure = [ft_wage + pt_wage for ft_wage, pt_wage in zip(get_full_time_wages_role(start_mmyy, end_mmyy, 'Kitchen'), get_part_time_wages_role(start_mmyy, end_mmyy, 'Kitchen'))]
+    
+    # Combine the total expenditures into a single list
+    total_expenditure = {
+        'Manager': manager_expenditure,
+        'Service': service_expenditure,
+        'Kitchen': kitchen_expenditure
+    }
+    return total_expenditure
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
