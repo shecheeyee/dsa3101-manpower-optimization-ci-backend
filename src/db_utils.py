@@ -8,6 +8,15 @@ config = {
     'database': 'mflg'
 }
 
+# config for unit testing of api
+# config = {
+#     'user': 'root',
+#     'password': 'root',
+#     'host': 'localhost',
+#     'port': 3307,
+#     'database': 'mflg'
+# }
+
 
 def execute_query(query):
     try:
