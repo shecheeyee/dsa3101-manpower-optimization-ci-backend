@@ -9,6 +9,12 @@ To deploy this application along with the frontend, see our [deployment repo](ht
 3. `docker-compose up`
 4. Try the endpoints using Postman or any other API testing tool
 
+### How to run unit tests
+1. Change db configurations in `db_utils.py` to the one for unit test
+2. cd to `src`
+3. `pytest`
+
+
 ### Project Folder Structure
 ```plaintext
 .
