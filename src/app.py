@@ -142,7 +142,7 @@ def get_past_demand():
     if 'error' in result:
         return jsonify(result), 500
     else:
-        past_demand_data = [{'Date': row["Date"], 'Day': row["Day"], 'Time': str(row["Time"]), "actualCustomers": row["actualCustomers"]} for row in result]
+        past_demand_data = [{'date': row["Date"], 'day': row["Day"], 'time': str(row["Time"]), "customers": row["actualCustomers"]} for row in result]
         return past_demand_data
 
 
@@ -172,7 +172,7 @@ def get_demand_forecast():
     if 'error' in result:
         return jsonify(result), 500
     else:
-        demand_forecast_data = [{'Date': row["Date"], 'Day': row["Day"], 'Time': str("Time"), "actualCustomers": row["expectedCustomers"]} for row in result]
+        demand_forecast_data = [{'date': row["Date"], 'day': row["Day"], 'time': str("Time"), "customers": row["expectedCustomers"]} for row in result]
         return demand_forecast_data
     
 # Function to get total monthly cost for full timer and part timer 
