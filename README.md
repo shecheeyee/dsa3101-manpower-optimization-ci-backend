@@ -13,7 +13,7 @@ To deploy this application along with the frontend, see our [deployment repo](ht
 1. Change db configurations in `db_utils.py` to the one for unit test
 2. cd to `src`
 3. `pytest`
-
+4. Change db configurations back to original one and do `docker-compose down -v` to ensure no side effects
 
 ### Project Folder Structure
 ```plaintext
