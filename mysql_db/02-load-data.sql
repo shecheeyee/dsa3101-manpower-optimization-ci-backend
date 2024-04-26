@@ -30,6 +30,12 @@ FIELDS TERMINATED BY ','
 LINES TERMINATED BY '\n'
 IGNORE 1 LINES;
 
+LOAD DATA INFILE '/var/lib/mysql-files/csv/05-mock_demand_forecast.csv'
+INTO TABLE PastDemand
+FIELDS TERMINATED BY ','
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES;
+
 -- INSERT INTO Employees (emp_id, first_name, last_name, dob, email, gender, primary_role, secondary_role, wage, status, address) VALUES ('1', 'Charin', 'Sneller', '1994-04-11', 'csneller0@ox.ac.uk', 'M', 'Manager', 'Manager', '4818.28', 'Full time', '3 Prentice Point');
 -- INSERT INTO Employees (emp_id, first_name, last_name, dob, email, gender, primary_role, secondary_role, wage, status, address) VALUES ('2', 'Karna', 'Topping', '1979-05-12', 'ktopping1@si.edu', 'M', 'Kitchen', 'Kitchen', '3910.96', 'Full time', '9 Summerview Park');
 -- INSERT INTO Employees (emp_id, first_name, last_name, dob, email, gender, primary_role, secondary_role, wage, status, address) VALUES ('3', 'Lindon', 'Kyncl', '1977-11-11', 'lkyncl2@mysql.com', 'M', 'Service', 'Service', '0', 'Part time', '9063 American Street');
