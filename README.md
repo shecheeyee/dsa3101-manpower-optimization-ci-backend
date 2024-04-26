@@ -6,14 +6,15 @@ To deploy this application along with the frontend, see our [deployment repo](ht
 ### How to run the backend
 1. git clone the repository
 2. `docker-compose build --no-cache`
-3. `docker-compose up`
+3. `docker-compose up -d`
 4. Try the endpoints using Postman or any other API testing tool
 
 ### How to run unit tests
-1. Change db configurations in `db_utils.py` to the one for unit test
-2. cd to `src`
-3. `pytest`
-4. Change db configurations back to original one and do `docker-compose down -v` to ensure no side effects
+1. `docker-compose up -d`
+2. Change db configurations in `db_utils.py` to the one for unit test
+3. cd to `src`
+4. `pytest` to see unit test results
+5. Change db configurations back to original one and do `docker-compose down -v` to ensure no side effects
 
 ### Project Folder Structure
 ```plaintext
