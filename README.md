@@ -50,26 +50,29 @@ This is the backend for the DSA3101 project. It is a RESTful API that provides e
 
 
 ### Endpoints
-1. Create Individual Employee: POST /employee
-1. Create Mutilple Employees: POST /employees
-2. Get Employees: GET /employee
-3. Update Employee: PUT /employee/<emp_id>
-4. Delete Employee: DELETE /employee/<emp_id>
-5. Get Wage: GET /wage
-6. Create Event: POST /event
-6. Create Individual Event: POST /event
-7. Get Mutilple Events: GET /events
-8. Update Event: PUT /event/<event_id>
-9. Delete Event: DELETE /event/<event_id>
-10. Create Schedule: POST /schedule
-11. Get Schedules: GET /schedule
-12. Store Optimal Schedule: POST /post_schedule
-13. Update Schedule: PUT /schedule/<schedule_id>
-14. Delete Schedule: DELETE /schedule/<schedule_id>
-15. Post Past Demand: POST /post_past_demand
-16. Get Past Demand: GET /get_past_demand
-17. Post Demand Forecast: POST /post_demand_forecast
-18. Get Demand Forecast: GET /get_demand_forecast
+| Route              | HTTP Method | Description                                                                                               |
+|--------------------|-------------|-----------------------------------------------------------------------------------------------------------|
+| /employee          | POST        | Create a new employee in the database along with their associated availability                           |
+| /employee          | GET         | Retrieves all employees to be displayed on frontend                                                      |
+| /employee/int:emp_id | PUT        | Updates an employee’s attributes identified by its ID including their availability                        |
+| /employee/int:emp_id | DELETE     | Delete an employee identified by its ID and all availability associated with the employee                |
+| /employees         | POST        | Create employees in the database from an uploaded CSV                                                    |
+| /event             | POST        | Create a new event in the database                                                                        |
+| /event             | GET         | Retrieve all events to be displayed on frontend                                                          |
+| /event/int:event_id | PUT        | Update an event’s attribute identified by its ID                                                          |
+| /event/int:event_id | DELETE     | Delete an event identified by its ID                                                                      |
+| /schedule          | POST        | Create a new schedule in the database                                                                     |
+| /schedule          | GET         | Retrieve all schedules to be displayed on frontend                                                        |
+| /schedule/int:schedule_id | PUT   | Update a schedule identified by its ID                                                                     |
+| /schedule/int:schedule_id | DELETE| Delete a schedule identified by its  ID                                                                    |
+| /generate_schedule | POST        | Generate and store schedule using backend schedule generator algorithm based on employees availability |
+| /post_past_demand  | POST        | Create past demand data in the database                                                                   |
+| /get_past_demand   | GET         | Get past demand data to be displayed on frontend                                                         |
+| /post_demand_forecast | POST     | Create demand forecast data in the database                                                               |
+| /get_demand_forecast  | GET      | Get demand forecast data to be displayed on frontend                                                      |
+| /total_cost_status | GET         | Calculates and return monthly total expenditure of Full Timers and Part Timers                             |
+| /total_cost_role   | GET         | Calculates and return monthly total expenditure of the different roles, Manager, Service and Kitchen     |
+
 
 ## Contributors
 ![BACKEND TEAM](images/good_old_days.jpg)
