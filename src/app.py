@@ -22,23 +22,6 @@ def create_new_employee():
     a = create_employee(employee_data)
     return jsonify({'message': 'Employee created successfully'}), 201
 
-# Function to create employees from the uploaded csv
-@app.route('/employees', methods=['POST'])
-def create_new_employees():
-    try:
-        data = request.get_json()
-
-        if not isinstance(data, list):
-            return jsonify({'error': 'Invalid data format, expected list of dictionaries'}), 400
-
-        # Process each row in the CSV data
-        a = create_employees(data)
-        app.logger.error(a)
-        return jsonify({'message': 'Employees created successfully'}), 200
-    except Exception as e:
-        app.logger.error("Error processing CSV data: %s", e)
-        return jsonify({'error': 'Failed to process CSV data'}), 500
-
 # Function to retrieve all employees
 @app.route('/employee', methods=['GET'])
 def get_employees():
@@ -57,6 +40,23 @@ def update_e(emp_id):
 def delete_e(emp_id):
     delete_employee(emp_id)
     return jsonify({'message': f'Employee with ID {emp_id} deleted successfully'}), 200
+
+# Function to create employees from the uploaded csv
+@app.route('/employees', methods=['POST'])
+def create_new_employees():
+    try:
+        data = request.get_json()
+
+        if not isinstance(data, list):
+            return jsonify({'error': 'Invalid data format, expected list of dictionaries'}), 400
+
+        # Process each row in the CSV data
+        a = create_employees(data)
+        app.logger.error(a)
+        return jsonify({'message': 'Employees created successfully'}), 200
+    except Exception as e:
+        app.logger.error("Error processing CSV data: %s", e)
+        return jsonify({'error': 'Failed to process CSV data'}), 500
     
 # Function to create a new event individually
 @app.route('/event', methods=['POST'])
@@ -99,17 +99,6 @@ def get_schedules():
     schedules = get_all_schedules()
     return jsonify(schedules)
 
-
-# Function to create optimized schedule from `algo.py`
-@app.route("/generate_schedule", methods=["POST"])
-def store_opt_schedule():
-    working_hours_limit = request.json
-    ft_hours = working_hours_limit["maxHrFT"]
-    pt_hours = working_hours_limit["maxHrPT"]
-    # staffing_algorithm() function executes the scheduling algorithm and stores the result in the database
-    staffing_algorithm(ft_hours=ft_hours, pt_hours=pt_hours)
-    return jsonify({"message": "Data stored successfully"})
-
 # Function to update a schedule
 @app.route('/schedule/<int:schedule_id>', methods=['PUT'])
 def update_schedule_endpoint(schedule_id):
@@ -123,6 +112,15 @@ def delete_schedule_endpoint(schedule_id):
     delete_schedule(schedule_id)
     return jsonify({'message': f'Schedule with ID {schedule_id} deleted successfully'}), 200
 
+# Function to create optimized schedule from `algo.py`
+@app.route("/generate_schedule", methods=["POST"])
+def store_opt_schedule():
+    working_hours_limit = request.json
+    ft_hours = working_hours_limit["maxHrFT"]
+    pt_hours = working_hours_limit["maxHrPT"]
+    # staffing_algorithm() function executes the scheduling algorithm and stores the result in the database
+    staffing_algorithm(ft_hours=ft_hours, pt_hours=pt_hours)
+    return jsonify({"message": "Data stored successfully"})
 
 # Function to store past demand data
 @app.route("/post_past_demand", methods=["POST"])
