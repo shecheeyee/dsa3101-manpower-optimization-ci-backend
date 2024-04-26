@@ -288,13 +288,13 @@ def get_full_time_wages_role(start_mmyy, end_mmyy, role):
     while (current_year < end_year or (current_year == end_year and current_month <= end_month)):
         # SQL query to retrieve total sum of wages for full-time employees with relevant schedules within the current month
         query = f"""
-            SELECT e.name, e.wage, s.starttime, s.endtime, s.role
+            SELECT e.name, e.wage, s.starttime, s.endtime
             FROM Employees e
             JOIN Schedules s ON e.emp_id = s.emp_id
             WHERE e.status = 'Full Time'
             AND YEAR(s.week) = {current_year}
             AND MONTH(s.week) = {current_month}
-            AND s.role = '{role}'
+            AND e.role = {role}
         """
         
         # Execute the query to retrieve the total sum of wages for the current month
@@ -334,13 +334,13 @@ def get_part_time_wages_role(start_mmyyyy, end_mmyyyy,role):
     while (current_year < end_year or (current_year == end_year and current_month <= end_month)):
         # SQL query to retrieve part-time employees' wage and hours worked within the current month
         query = f"""
-            SELECT e.name, e.wage, s.starttime, s.endtime, s.role
+            SELECT e.name, e.wage, s.starttime, s.endtime, e.role
             FROM Employees e
             JOIN Schedules s ON e.emp_id = s.emp_id
             WHERE e.status = 'Part Time'
             AND YEAR(s.week) = {current_year}
             AND MONTH(s.week) = {current_month}
-            AND s.role = '{role}'
+            AND e.role = {role}
         """
         
         # Execute the query to retrieve part-time employees' data for the current month

@@ -177,13 +177,13 @@ def get_demand_forecast():
         demand_forecast_data = [{'Date': row["Date"], 'Day': row["Day"], 'Time': str("Time"), "actualCustomers": row["expectedCustomers"]} for row in result]
         return demand_forecast_data
     
-# Function to get total monthly cost for full timer and part timer 
+# Function to get total monthly cost for full timer and part timer
 @app.route('/total_cost_status', methods=['GET'])
 def calculate_total_expenditure_status():
     # Get start_mmyy and end_mmyy from request data
     request_data = request.json
-    start_mmyy = request_data.get('start_mmyyyy')
-    end_mmyy = request_data.get('end_mmyyyy')
+    start_mmyy = request_data.get('start_mmyy')
+    end_mmyy = request_data.get('end_mmyy')
     
     # Calculate total expenditure for full-time employees between the specified months
     full_time_expenditure = get_full_time_wages(start_mmyy, end_mmyy)
@@ -203,8 +203,8 @@ def calculate_total_expenditure_status():
 def calculate_total_expenditure_role():
     # Get start_mmyy and end_mmyy from request data
     request_data = request.json
-    start_mmyy = request_data.get('start_mmyyyy')
-    end_mmyy = request_data.get('end_mmyyyy')
+    start_mmyy = request_data.get('start_mmyy')
+    end_mmyy = request_data.get('end_mmyy')
     
     manager_expenditure = [ft_wage + pt_wage for ft_wage, pt_wage in zip(get_full_time_wages_role(start_mmyy, end_mmyy, 'Manager'), get_part_time_wages_role(start_mmyy, end_mmyy, 'Manager'))]
     service_expenditure = [ft_wage + pt_wage for ft_wage, pt_wage in zip(get_full_time_wages_role(start_mmyy, end_mmyy, 'Service'), get_part_time_wages_role(start_mmyy, end_mmyy, 'Service'))]
