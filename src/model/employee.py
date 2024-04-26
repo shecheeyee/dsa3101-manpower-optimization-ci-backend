@@ -5,71 +5,75 @@ import logging
 
 logging.basicConfig(level=logging.DEBUG)
 
-# Function to create a new employee
 def create_employee(data):
-    # Extract employee data from the input dictionary
+    """
+    Creates a new employee in the database.
+
+    Args:
+        data (dict): A dictionary containing employee data including name, primary role, secondary role, wage, and employment type.
+
+    Returns:
+        None
+    """
     name = data.get('name')
     primary_role = data.get('role')
     secondary_role = data.get('secondaryRole')
     wage = data.get('wage')
-    status = data.get('employmentType')  # Employment status (e.g., full-time, part-time)
-    
+    status = data.get('employmentType')
     query = "SELECT MAX(emp_id) FROM Employees"
     emp_id = execute_query(query)[0]['MAX(emp_id)'] + 1
-    
-    # Prepare SQL query to insert into Employees table
     insert_employee_query = f"""
         INSERT INTO Employees (emp_id, name primary_role, secondary_role, wage, status)
         VALUES ('{emp_id}', '{name}', '{primary_role}', '{secondary_role}', {wage}, '{status}')
     """
-    
-    # Execute the insert query to add the employee to Employees table
-    a = execute_query(insert_employee_query)
-
-    # Prepare SQL query to insert into Availability table
+    execute_query(insert_employee_query)
     insert_availability_query = f"""
         INSERT INTO Availability (emp_id, week, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday)
         VALUES  ({emp_id}, '2023-12-31', '{data.get('mon')}', '{data.get('tues')}', '{data.get('wed')}', '{data.get('thurs')}', '{data.get('fri')}', '{data.get('sat')}', '{data.get('sun')}')
     """
-    a = execute_query(insert_availability_query)
+    execute_query(insert_availability_query)
 
-    # Return the emp_id of the newly created employee
-    return a
-
-# Function to create employees
 def create_employees(employees_data_list):
+    """
+    Creates multiple employees in the database.
+
+    Args:
+        employees_data_list (list): A list of dictionaries containing employee data.
+
+    Returns:
+        None
+    """
     query = "SELECT MAX(emp_id) FROM Employees"
     emp_id = execute_query(query)[0]['MAX(emp_id)'] + 1
     
     for data in employees_data_list:
-        # Extract employee data from the input dictionary
         name = data.get('name')
         primary_role = data.get('role')
         secondary_role = data.get('secondaryRole')
         wage = data.get('wage')
-        status = data.get('employmentType')  # Employment status (e.g., full-time, part-time)
-        
-        # Prepare SQL query to insert into Employees table
+        status = data.get('employmentType')  
         insert_employee_query = f"""
             INSERT INTO Employees (emp_id, name, primary_role, secondary_role, wage, status)
             VALUES ('{emp_id}', '{name}', '{primary_role}', '{secondary_role}', {wage}, '{status}')
         """
+        execute_query(insert_employee_query)
         
-        # Execute the insert query to add the employee to Employees table
-        a = execute_query(insert_employee_query)
-        
-        # Prepare SQL query to insert into Availability table
         insert_availability_query = f"""
             INSERT INTO Availability (emp_id, week, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday)
             VALUES  ({emp_id}, '2023-12-31', '{data.get('mon')}', '{data.get('tues')}', '{data.get('wed')}', '{data.get('thurs')}', '{data.get('fri')}', '{data.get('sat')}', '{data.get('sun')}')
         """
         execute_query(insert_availability_query)
         
-        emp_id += 1  # Increment emp_id for the next employee
-    return a
+        emp_id += 1  
 
-# Function to retrieve all employees
+
 def get_all_employees():
+    """
+    Retrieves all employees from the database.
+
+    Returns:
+        list: A list of dictionaries containing employee details.
+    """
     query = """
         SELECT e.emp_id, e.name,
                e.primary_role, e.secondary_role, e.wage, e.status,
@@ -82,14 +86,10 @@ def get_all_employees():
             WHERE emp_id = e.emp_id
         )
     """
-    # Execute the query using execute_query function and return the result
     result = execute_query(query)
-    
-    # Process the result to build a list of employees with their availability
     employees = []
     for row in result:
         emp_id = row['emp_id']
-        # Build the employee dictionary
         employee = {
             'id': emp_id,
             'name': f"{row['name']}",
@@ -110,20 +110,26 @@ def get_all_employees():
     return employees
 
 
-# Function to update an employee
+
 def update_employee(emp_id, data):
-    # Extract employee data from the input dictionary
-    name = data.get('name')  # Use get() to safely retrieve data, allowing for optional fields
+    """
+    Updates an employee's information in the database.
+
+    Args:
+        emp_id (int): The ID of the employee to be updated.
+        data (dict): A dictionary containing the updated employee data.
+
+    Returns:
+        None
+    """
+    name = data.get('name') 
     primary_role = data.get('role')
     secondary_role = data.get('secondaryRole')
     wage = data.get('wage')
-    status = data.get('employmentType')  # Employment status (e.g., full-time, part-time)
-
-    # Prepare SQL query to update Employees table
+    status = data.get('employmentType')  
     update_employee_query = "UPDATE Employees SET "
     update_set_values = []
 
-    # Build the SET clause of the UPDATE query based on provided fields
     if name is not None:
         update_set_values.append(f"name = '{name}'")
     if primary_role is not None:
@@ -135,11 +141,9 @@ def update_employee(emp_id, data):
     if status is not None:
         update_set_values.append(f"status = '{status}'")
 
-    # Join the SET values into the UPDATE query
     update_employee_query += ", ".join(update_set_values)
     update_employee_query += f" WHERE emp_id = {emp_id}"
 
-    # Execute the update query to modify the employee's information
     execute_query(update_employee_query)
 
 
@@ -157,35 +161,42 @@ def update_employee(emp_id, data):
 
     execute_query(update_availability_query)
 
-
-
-# Function to delete an employee
 def delete_employee(emp_id):
-    # Delete from Availability table first
+    """
+    Deletes an employee from the database.
+
+    Args:
+        emp_id (int): The ID of the employee to be deleted.
+
+    Returns:
+        None
+    """
     availability_query = f"DELETE FROM Availability WHERE emp_id = {emp_id}"
     execute_query(availability_query)
-    
-    # Then delete from Employees table
     employee_query = f"DELETE FROM Employees WHERE emp_id = {emp_id}"
     execute_query(employee_query)
 
-
-#Function to get list of wages cost for for each month between two months (inclusive)
 def get_full_time_wages(start_mmyy, end_mmyy):
-    # Parse input month-year values (MMYY) to extract month and year
+    """
+    Calculates the total wage expenditure for full-time employees for each month between two months (inclusive).
+
+    Args:
+        start_mmyy (str): Start month-year in MMYY format.
+        end_mmyy (str): End month-year in MMYY format.
+
+    Returns:
+        list: A list of total wage expenditures for each month.
+    """
     start_month = int(start_mmyy[:2])
     start_year = int(start_mmyy[2:])
     end_month = int(end_mmyy[:2])
     end_year = int(end_mmyy[2:])
-    
-    # List to store monthly total sum of wages for full-time employees
+
     monthly_totals = []
-    
-    # Iterate over the months in the specified range
+
     current_month = start_month
     current_year = start_year
     while (current_year < end_year or (current_year == end_year and current_month <= end_month)):
-        # SQL query to retrieve total sum of wages for full-time employees with relevant schedules within the current month
         query = f"""
             SELECT e.name, e.wage, s.starttime, s.endtime
             FROM Employees e
@@ -194,19 +205,15 @@ def get_full_time_wages(start_mmyy, end_mmyy):
             AND YEAR(s.week) = {current_year}
             AND MONTH(s.week) = {current_month}
         """
-        
-        # Execute the query to retrieve the total sum of wages for the current month
         result = execute_query(query)
 
         total_wages  = 0.0
         for row in result:
             wage = float(row['wage'])
             total_wages += wage
-        
-        # Append the total sum of wages for the current month to the monthly_totals list
+
         monthly_totals.append(total_wages)
-        
-        # Move to the next month
+    
         current_month += 1
         if current_month > 12:
             current_month = 1
@@ -214,23 +221,25 @@ def get_full_time_wages(start_mmyy, end_mmyy):
     
     return monthly_totals
 
-
-# Function to calculate total wage expenditure for part-time employees for each month between two months (inclusive)
 def get_part_time_wages(start_mmyyyy, end_mmyyyy):
-    # Parse input month-year values (MMYY) to extract month and year
+    """
+    Calculates the total wage expenditure for part-time employees for each month between two months (inclusive).
+
+    Args:
+        start_mmyyyy (str): Start month-year in MMYYYY format.
+        end_mmyyyy (str): End month-year in MMYYYY format.
+
+    Returns:
+        list: A list of total wage expenditures for each month.
+    """
     start_month = int(start_mmyyyy[:2])
     start_year = int(start_mmyyyy[2:])
     end_month = int(end_mmyyyy[:2])
     end_year = int(end_mmyyyy[2:])
-    
-    # List to store monthly total wage expenditures
     monthly_expenditures = []
-    
-    # Iterate over the months in the specified range
     current_month = start_month
     current_year = start_year
     while (current_year < end_year or (current_year == end_year and current_month <= end_month)):
-        # SQL query to retrieve part-time employees' wage and hours worked within the current month
         query = f"""
             SELECT e.name, e.wage, s.starttime, s.endtime
             FROM Employees e
@@ -239,30 +248,17 @@ def get_part_time_wages(start_mmyyyy, end_mmyyyy):
             AND YEAR(s.week) = {current_year}
             AND MONTH(s.week) = {current_month}
         """
-        
-        # Execute the query to retrieve part-time employees' data for the current month
         result = execute_query(query)
-        # Variable to store total wage expenditure for the current month
         total_wage_expenditure = 0.0
-        # Process the query result to calculate total wage expenditure for the current month
         for row in result:
             wage = float(row['wage'])
             shift_start = row['starttime']
             shift_end = row['endtime']
-            
-            # Calculate hours worked in the shift
             hours_worked = (shift_end - shift_start).total_seconds() / 3600.0
-            
-            # Calculate wage expenditure for the current shift
             shift_wage_expenditure = wage * hours_worked
-            
-            # Accumulate the shift wage expenditure to total wage expenditure for the current month
             total_wage_expenditure += shift_wage_expenditure
-        
-        # Append the total wage expenditure for the current month to the monthly_expenditures list
         monthly_expenditures.append(total_wage_expenditure)
-        
-        # Move to the next month
+
         current_month += 1
         if current_month > 12:
             current_month = 1
@@ -271,22 +267,26 @@ def get_part_time_wages(start_mmyyyy, end_mmyyyy):
     return monthly_expenditures
 
 
-#Function to get list of wages cost for for each month between two months (inclusive)
 def get_full_time_wages_role(start_mmyy, end_mmyy, role):
-    # Parse input month-year values (MMYY) to extract month and year
+    """
+    Calculates the total wage expenditure for full-time employees of a specific role for each month between two months (inclusive).
+
+    Args:
+        start_mmyy (str): Start month-year in MMYY format.
+        end_mmyy (str): End month-year in MMYY format.
+        role (str): The role of the employees.
+
+    Returns:
+        list: A list of total wage expenditures for each month.
+    """
     start_month = int(start_mmyy[:2])
     start_year = int(start_mmyy[2:])
     end_month = int(end_mmyy[:2])
     end_year = int(end_mmyy[2:])
-    
-    # List to store monthly total sum of wages for full-time employees
     monthly_totals = []
-    
-    # Iterate over the months in the specified range
     current_month = start_month
     current_year = start_year
     while (current_year < end_year or (current_year == end_year and current_month <= end_month)):
-        # SQL query to retrieve total sum of wages for full-time employees with relevant schedules within the current month
         query = f"""
             SELECT e.name, e.wage, s.starttime, s.endtime, s.role
             FROM Employees e
@@ -296,19 +296,13 @@ def get_full_time_wages_role(start_mmyy, end_mmyy, role):
             AND MONTH(s.week) = {current_month}
             AND s.role = '{role}'
         """
-        
-        # Execute the query to retrieve the total sum of wages for the current month
         result = execute_query(query)
 
         total_wages  = 0.0
         for row in result:
             wage = float(row['wage'])
             total_wages += wage
-        
-        # Append the total sum of wages for the current month to the monthly_totals list
         monthly_totals.append(total_wages)
-        
-        # Move to the next month
         current_month += 1
         if current_month > 12:
             current_month = 1
@@ -316,23 +310,26 @@ def get_full_time_wages_role(start_mmyy, end_mmyy, role):
     
     return monthly_totals
 
-
-# Function to calculate total wage expenditure for part-time employees for each month between two months (inclusive)
 def get_part_time_wages_role(start_mmyyyy, end_mmyyyy,role):
-    # Parse input month-year values (MMYY) to extract month and year
+    """
+    Calculates the total wage expenditure for part-time employees of a specific role for each month between two months (inclusive).
+
+    Args:
+        start_mmyyyy (str): Start month-year in MMYYYY format.
+        end_mmyyyy (str): End month-year in MMYYYY format.
+        role (str): The role of the employees.
+
+    Returns:
+        list: A list of total wage expenditures for each month.
+    """
     start_month = int(start_mmyyyy[:2])
     start_year = int(start_mmyyyy[2:])
     end_month = int(end_mmyyyy[:2])
     end_year = int(end_mmyyyy[2:])
-    
-    # List to store monthly total wage expenditures
     monthly_expenditures = []
-    
-    # Iterate over the months in the specified range
     current_month = start_month
     current_year = start_year
     while (current_year < end_year or (current_year == end_year and current_month <= end_month)):
-        # SQL query to retrieve part-time employees' wage and hours worked within the current month
         query = f"""
             SELECT e.name, e.wage, s.starttime, s.endtime, s.role
             FROM Employees e
@@ -342,30 +339,17 @@ def get_part_time_wages_role(start_mmyyyy, end_mmyyyy,role):
             AND MONTH(s.week) = {current_month}
             AND s.role = '{role}'
         """
-        
-        # Execute the query to retrieve part-time employees' data for the current month
         result = execute_query(query)
-        # Variable to store total wage expenditure for the current month
         total_wage_expenditure = 0.0
-        # Process the query result to calculate total wage expenditure for the current month
         for row in result:
             wage = float(row['wage'])
             shift_start = row['starttime']
             shift_end = row['endtime']
-            
-            # Calculate hours worked in the shift
             hours_worked = (shift_end - shift_start).total_seconds() / 3600.0
-            
-            # Calculate wage expenditure for the current shift
             shift_wage_expenditure = wage * hours_worked
-            
-            # Accumulate the shift wage expenditure to total wage expenditure for the current month
             total_wage_expenditure += shift_wage_expenditure
-        
-        # Append the total wage expenditure for the current month to the monthly_expenditures list
         monthly_expenditures.append(total_wage_expenditure)
-        
-        # Move to the next month
+
         current_month += 1
         if current_month > 12:
             current_month = 1

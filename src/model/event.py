@@ -1,8 +1,15 @@
-# Import the execute_query function from db_utils.py
 from db_utils import execute_query
 
-# Function to create a new event
 def create_event(data):
+    """
+    Creates a new event in the database.
+
+    Args:
+        data (dict): A dictionary containing event data.
+
+    Returns:
+        None
+    """
     mapped_fields = {
         'id': 'event_id',
         'eventName': 'event_name',
@@ -27,21 +34,23 @@ def create_event(data):
     query = f"INSERT INTO Events ({field_names}) VALUES ({field_values})"
     execute_query(query)
 
-
-# Function to retrieve all events
 def get_all_events():
+    """
+    Retrieves all events from the database.
+
+    Returns:
+        list: A list of dictionaries containing event details.
+    """
     query = "SELECT * FROM Events"
-    # Assuming execute_query is properly implemented elsewhere
     events_from_db = execute_query(query)
     
-    # Map database rows to frontend Event format
     events_for_frontend = []
     for event in events_from_db:
         mapped_event = {
-            'id': event['event_id'],  # Assuming 'event_id' is the primary key
+            'id': event['event_id'],
             'eventName': event['event_name'],
-            'eventDate': event['date'].strftime('%Y-%m-%d'),  # Format date as string
-            'eventSession': event['event_period'],  # Convert to Enum
+            'eventDate': event['date'].strftime('%Y-%m-%d'),
+            'eventSession': event['event_period'],
             'numPax': event['num_pax'],
             'staffReq': event['staffReq'],
             'remark': event['remark']
@@ -50,8 +59,17 @@ def get_all_events():
     
     return events_for_frontend
 
-# Function to update an event
 def update_event(event_id, update_data):
+    """
+    Updates an event in the database.
+
+    Args:
+        event_id (int): The ID of the event to be updated.
+        update_data (dict): A dictionary containing updated event data.
+
+    Returns:
+        None
+    """
     mapped_fields = {
         'id': 'event_id',
         'eventName': 'event_name',
@@ -75,7 +93,15 @@ def update_event(event_id, update_data):
     query = f"UPDATE Events SET {set_clause} WHERE event_id = {event_id}"
     execute_query(query)
 
-# Function to delete an event
 def delete_event(event_id):
+    """
+    Deletes an event from the database.
+
+    Args:
+        event_id (int): The ID of the event to be deleted.
+
+    Returns:
+        None
+    """
     query = f"DELETE FROM Events WHERE event_id = {event_id}"
     execute_query(query)
