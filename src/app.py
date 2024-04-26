@@ -125,15 +125,17 @@ def store_opt_schedule():
 # Function to store past demand data
 @app.route("/post_past_demand", methods=["POST"])
 def post_past_demand():
-    csv_file = request.files['file']
-    df = pd.read_csv(csv_file)
-    for index, row in df.iterrows():
-            field_names = f"Date, Day, Time, actualCustomers"
-            field_values = f"DATE '{row['Date']}', '{row['Day']}', TIME '{row['Time']}', '{row['Customers']}'"
-            query = f"INSERT INTO PastDemand ({field_names}) VALUES ({field_values})"
-            execute_query(query)
+    data = request.json
+    if data is None:
+        return jsonify({"error": "No data provided"}), 400
+    
+    field_names = "Date, Day, Time, actualCustomers"
+    field_values = f"DATE '{data['date']}', '{data['day']}', TIME '{data['time']}', '{data['customers']}'"
+    query = f"INSERT INTO PastDemand ({field_names}) VALUES ({field_values})"
+    execute_query(query)
+    
     return jsonify({"message": "Data stored successfully"})
- 
+
 # Function to get past demand data
 @app.route("/get_past_demand", methods=["GET"])
 def get_past_demand():
